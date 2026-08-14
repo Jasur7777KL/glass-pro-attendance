@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glass Pro — Davomat tizimi</title>
+  <style>
+    :root{
+      --primary:#2563eb;--primary-dark:#1d4ed8;--bg:#f5f7fb;--card:#fff;
+      --text:#172033;--muted:#64748b;--border:#e5e7eb;--green:#16a34a;
+      --yellow:#d97706;--red:#dc2626;--blue-soft:#eff6ff;
+      --shadow:0 8px 30px rgba(15,23,42,.06);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    button,input,select{font:inherit}
+    button{cursor:pointer;border:0}
+    .app{display:flex;min-height:100vh}
+    .sidebar{width:250px;background:#fff;border-right:1px solid var(--border);padding:22px 16px;position:fixed;left:0;top:0;bottom:0;z-index:10}
+    .brand{display:flex;align-items:center;gap:12px;padding:5px 10px 28px}
+    .brand-logo{width:42px;height:42px;border-radius:12px;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:800;font-size:20px}
+    .brand strong{display:block;font-size:17px}.brand span{font-size:12px;color:var(--muted)}
+    .nav{display:flex;flex-direction:column;gap:6px}
+    .nav button{background:transparent;color:#475569;text-align:left;padding:12px 13px;border-radius:10px;font-size:14px}
+    .nav button:hover,.nav button.active{background:var(--blue-soft);color:var(--primary);font-weight:600}
+    .main{margin-left:250px;width:calc(100% - 250px);padding:25px 30px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
+    .topbar h1{font-size:25px;margin:0 0 5px}.topbar p{margin:0;color:var(--muted);font-size:14px}
+    .clock{background:#fff;border:1px solid var(--border);padding:10px 14px;border-radius:10px;font-weight:600}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+    .stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+    .stat-label{color:var(--muted);font-size:13px}.stat-value{font-size:29px;font-weight:750;margin-top:8px}.stat-note{font-size:12px;color:var(--muted);margin-top:5px}
+    .card{background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:20px}
+    .section-head{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:16px}
+    .section-head h2{font-size:18px;margin:0}.actions{display:flex;gap:9px;flex-wrap:wrap}
+    .btn{padding:10px 14px;border-radius:9px;font-weight:600;font-size:13px}
+    .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
+    .btn-light{background:#f8fafc;color:#334155;border:1px solid var(--border)}
+    .btn-danger{background:#fee2e2;color:#b91c1c}
+    .toolbar{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+    input,select{border:1px solid var(--border);border-radius:9px;padding:10px 12px;background:#fff;outline:none}
+    input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
+    .search{min-width:250px;flex:1}
+    table{width:100%;border-collapse:collapse}
+    th,td{text-align:left;padding:13px 10px;border-bottom:1px solid #eef2f7;font-size:13px}
+    th{color:var(--muted);font-weight:600;background:#fafbfc}
+    .person{display:flex;align-items:center;gap:10px}.avatar{width:35px;height:35px;border-radius:50%;display:grid;place-items:center;background:#dbeafe;color:#1d4ed8;font-weight:700}
+    .person-name{font-weight:650}.person-sub{font-size:11px;color:var(--muted)}
+    .badge{display:inline-flex;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700}
+    .green{background:#dcfce7;color:#15803d}.yellow{background:#fef3c7;color:#b45309}.red{background:#fee2e2;color:#b91c1c}.blue{background:#dbeafe;color:#1d4ed8}.gray{background:#f1f5f9;color:#64748b}
+    .empty{text-align:center;padding:40px;color:var(--muted)}
+    .hidden{display:none!important}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .dept-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+    .dept{padding:18px;border:1px solid var(--border);border-radius:13px;background:#fff}
+    .dept h3{margin:0 0 7px;font-size:16px}.dept p{margin:0;color:var(--muted);font-size:13px}.dept-count{font-size:26px;font-weight:750;margin-top:14px}
+    .modal{position:fixed;inset:0;background:rgba(15,23,42,.42);display:grid;place-items:center;padding:20px;z-index:50}
+    .modal-box{background:#fff;width:min(560px,100%);border-radius:16px;padding:22px;box-shadow:0 20px 60px rgba(15,23,42,.2)}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-head h2{margin:0;font-size:19px}
+    .close{background:#f1f5f9;width:34px;height:34px;border-radius:9px;font-size:20px}
+    .form{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;color:#475569;font-weight:600}
+    .modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
+    .toast{position:fixed;right:22px;bottom:22px;background:#172033;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:var(--shadow);z-index:100;font-size:13px}
+    .hero{background:linear-gradient(135deg,#eff6ff,#fff);border:1px solid #dbeafe;border-radius:15px;padding:20px;margin-bottom:18px}
+    .hero h2{margin:0 0 6px;font-size:19px}.hero p{margin:0;color:#64748b;font-size:13px}
+    @media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.dept-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:760px){
+      .sidebar{width:72px;padding:16px 10px}.brand div:not(.brand-logo),.nav button span{display:none}.brand{padding:5px 5px 25px}.nav button{text-align:center}
+      .main{margin-left:72px;width:calc(100% - 72px);padding:18px}.grid2{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}
+      .table-wrap{overflow:auto}table{min-width:800px}.form{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">GP</div>
+      <div><strong>Glass Pro</strong><span>Davomat tizimi</span></div>
+    </div>
+    <nav class="nav">
+      <button class="active" data-page="dashboard">🏠 <span>Bosh sahifa</span></button>
+      <button data-page="employees">👥 <span>Xodimlar</span></button>
+      <button data-page="attendance">🕐 <span>Bugungi davomat</span></button>
+      <button data-page="history">📅 <span>Davomat tarixi</span></button>
+      <button data-page="departments">🏢 <span>Bo‘limlar</span></button>
+      <button data-page="reports">📊 <span>Hisobotlar</span></button>
+      <button data-page="settings">⚙️ <span>Sozlamalar</span></button>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div><h1 id="pageTitle">Bosh sahifa</h1><p id="dateText"></p></div>
+      <div class="clock" id="clock">--:--:--</div>
+    </div>
+
+    <section id="dashboard" class="page">
+      <div class="hero">
+        <h2>Glass Pro xodimlar va davomat boshqaruvi</h2>
+        <p>Bugungi ish vaqti: <strong id="workTimeHero">08:30 — 18:00</strong>. Davomat ma’lumotlari real vaqtga yaqin tarzda yangilanadi.</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Jami xodimlar</div><div class="stat-value" id="totalEmployees">0</div><div class="stat-note">Faol xodimlar</div></div>
+        <div class="stat"><div class="stat-label">Bugun kelganlar</div><div class="stat-value" id="presentCount">0</div><div class="stat-note">Kelish qayd etilgan</div></div>
+        <div class="stat"><div class="stat-label">Kelmaganlar</div><div class="stat-value" id="absentCount">0</div><div class="stat-note">Hali kelish qayd etilmagan</div></div>
+        <div class="stat"><div class="stat-label">Kechikkanlar</div><div class="stat-value" id="lateCount">0</div><div class="stat-note">08:30 dan keyin</div></div>
+      </div>
+      <div class="card">
+        <div class="section-head"><h2>Bugungi davomat</h2><div class="actions"><button class="btn btn-primary" onclick="showPage('attendance')">Barchasini ko‘rish</button></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Holat</th></tr></thead><tbody id="dashboardAttendance"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="employees" class="page hidden">
+      <div class="card">
+        <div class="section-head"><h2>Xodimlar ro‘yxati</h2><button class="btn btn-primary" onclick="openEmployeeModal()">+ Xodim qo‘shish</button></div>
+        <div class="toolbar"><input class="search" id="employeeSearch" placeholder="Ism, familiya yoki ID bo‘yicha qidirish..." oninput="renderEmployees()"><select id="employeeDept" onchange="renderEmployees()"><option value="">Barcha bo‘limlar</option></select></div>
+        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>ID</th><th>Bo‘lim</th><th>Lavozim</th><th>Holat</th><th>Amallar</th></tr></thead><tbody id="employeesTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="attendance" class="page hidden">
+      <div class="card">
+        <div class="section-head"><h2>Bugungi davomat</h2><div class="actions"><button class="btn btn-primary" onclick="openAttendanceModal()">+ Davomat qo‘shish</button><button class="btn btn-light" onclick="resetToday()">Demo kunini tozalash</button></div></div>
+        <div class="toolbar"><input class="search" id="attendanceSearch" placeholder="Xodimni qidirish..." oninput="renderAttendance()"><select id="attendanceFilter" onchange="renderAttendance()"><option value="">Barcha holatlar</option><option value="present">Ishda</option><option value="late">Kechikdi</option><option value="absent">Kelmagan</option><option value="done">Ishni tugatdi</option></select><select id="attendanceDept" onchange="renderAttendance()"><option value="">Barcha bo‘limlar</option></select></div>
+        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Kechikish</th><th>Ishlangan vaqt</th><th>Holat</th><th>Amal</th></tr></thead><tbody id="attendanceTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="history" class="page hidden">
+      <div class="card">
+        <div class="section-head"><h2>Davomat tarixi</h2><input type="date" id="historyDate" onchange="renderHistory()"></div>
+        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Kechikish</th><th>Ishlangan vaqt</th><th>Holat</th></tr></thead><tbody id="historyTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="departments" class="page hidden">
+      <div class="card">
+        <div class="section-head"><h2>Bo‘limlar</h2><button class="btn btn-primary" onclick="openDeptModal()">+ Bo‘lim qo‘shish</button></div>
+        <div class="dept-grid" id="departmentGrid"></div>
+      </div>
+    </section>
+
+    <section id="reports" class="page hidden">
+      <div class="grid2">
+        <div class="card"><h2>Umumiy ko‘rsatkichlar</h2><p>Jami xodimlar: <strong id="reportTotal">0</strong></p><p>Bugun kelganlar: <strong id="reportPresent">0</strong></p><p>Kechikkanlar: <strong id="reportLate">0</strong></p><p>Kelmaganlar: <strong id="reportAbsent">0</strong></p></div>
+        <div class="card"><h2>Eksport</h2><p style="color:#64748b;font-size:13px">Bugungi davomatni CSV formatida yuklab oling.</p><button class="btn btn-primary" onclick="exportCSV()">CSV yuklab olish</button></div>
+      </div>
+    </section>
+
+    <section id="settings" class="page hidden">
+      <div class="card">
+        <div class="section-head"><h2>Sozlamalar</h2></div>
+        <div class="form">
+          <div class="field"><label>Ish boshlanish vaqti</label><input type="time" id="startTime"></div>
+          <div class="field"><label>Ish tugash vaqti</label><input type="time" id="endTime"></div>
+          <div class="field full"><button class="btn btn-primary" onclick="saveSettings()">Sozlamalarni saqlash</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal hidden" id="employeeModal">
+  <div class="modal-box">
+    <div class="modal-head"><h2>Yangi xodim qo‘shish</h2><button class="close" onclick="closeModal('employeeModal')">×</button></div>
+    <form class="form" id="employeeForm">
+      <div class="field"><label>Ism</label><input id="firstName" required></div>
+      <div class="field"><label>Familiya</label><input id="lastName" required></div>
+      <div class="field"><label>Xodim ID</label><input id="employeeId" placeholder="GP-001" required></div>
+      <div class="field"><label>Lavozim</label><input id="position" required></div>
+      <div class="field"><label>Bo‘lim</label><select id="department" required></select></div>
+      <div class="field"><label>Telefon</label><input id="phone"></div>
+      <div class="field"><label>Ishga qabul qilingan sana</label><input type="date" id="hireDate"></div>
+      <div class="modal-actions full"><button type="button" class="btn btn-light" onclick="closeModal('employeeModal')">Bekor qilish</button><button class="btn btn-primary">Saqlash</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal hidden" id="deptModal">
+  <div class="modal-box">
+    <div class="modal-head"><h2>Yangi bo‘lim</h2><button class="close" onclick="closeModal('deptModal')">×</button></div>
+    <form id="deptForm"><div class="field"><label>Bo‘lim nomi</label><input id="newDept" required></div><div class="modal-actions"><button type="button" class="btn btn-light" onclick="closeModal('deptModal')">Bekor qilish</button><button class="btn btn-primary">Saqlash</button></div></form>
+  </div>
+</div>
+
+<div class="modal hidden" id="attendanceModal">
+  <div class="modal-box">
+    <div class="modal-head"><h2>Davomat qo‘shish</h2><button class="close" onclick="closeModal('attendanceModal')">×</button></div>
+    <form class="form" id="attendanceForm">
+      <div class="field full"><label>Xodim</label><select id="attendanceEmployee" required></select></div>
+      <div class="field"><label>Sana</label><input type="date" id="attendanceDate" required></div>
+      <div class="field"><label>Kelgan vaqt</label><input type="time" id="attendanceCheckIn" required></div>
+      <div class="field"><label>Ketgan vaqt (ixtiyoriy)</label><input type="time" id="attendanceCheckOut"></div>
+      <div class="field full"><small style="color:#64748b">08:30 dan keyingi kelish avtomatik ravishda “Kechikdi” deb belgilanadi.</small></div>
+      <div class="modal-actions full"><button type="button" class="btn btn-light" onclick="closeModal('attendanceModal')">Bekor qilish</button><button class="btn btn-primary">Saqlash</button></div>
+    </form>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// SUPABASE ULASH: shu ikki qiymatni Supabase Project Settings → API dan olingan qiymatlar bilan almashtiring.
+const SUPABASE_URL = 'https://ejgvigqruszjfvoavgvn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqZ3ZpZ3FydXN6amZ2b2F2Z3ZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2ODU0OTYsImV4cCI6MjEwMjI2MTQ5Nn0.FMOF4yOE2sNCQnuMZj2ZLTjGKPWLiYtCeiWg6EFefww';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const KEY='glasspro_data_v2';
+let data={
+  settings:{start:'08:30',end:'18:00'},
+  departments:[],
+  employees:[],
+  attendance:{}
+};
+let dbReady=false;
+
+function today(){ return new Date().toLocaleDateString('en-CA'); }
+function hm(){ return new Date().toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'}); }
+function nowTime(){ return new Date().toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+function mins(t){ if(!t) return 0; const [h,m]=t.slice(0,5).split(':').map(Number); return h*60+m; }
+function diffText(a,b){
+  if(!a||!b) return '—';
+  const d=Math.max(0,mins(b)-mins(a));
+  return `${Math.floor(d/60)} soat ${d%60} daqiqa`;
+}
+function statusOf(a){
+  if(!a || !a.checkIn) return 'absent';
+  if(a.checkOut) return 'done';
+  if(mins(a.checkIn)>mins(data.settings.start)) return 'late';
+  return 'present';
+}
+function statusBadge(s){
+  const map={present:['Ishda','green'],late:['Kechikdi','yellow'],absent:['Kelmagan','red'],done:['Ishni tugatdi','blue']};
+  const [t,c]=map[s]||['—','gray'];
+  return `<span class="badge ${c}">${t}</span>`;
+}
+function lateText(a){
+  if(!a?.checkIn || mins(a.checkIn)<=mins(data.settings.start)) return '—';
+  return `${mins(a.checkIn)-mins(data.settings.start)} daqiqa`;
+}
+function ensureToday(){
+  if(!data.attendance[today()]) data.attendance[today()]={};
+}
+function attendanceFor(e){
+  return (data.attendance[today()]||{})[e.dbId]||{};
+}
+function fullName(e){ return e.full_name || `${e.first||''} ${e.last||''}`.trim(); }
+function initials(e){
+  const n=fullName(e).split(/\s+/).filter(Boolean);
+  return `${(n[0]?.[0]||'')}${(n[1]?.[0]||'')}`;
+}
+function esc(v){
+  return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function toast(t){
+  toastEl.textContent=t; toastEl.classList.remove('hidden');
+  clearTimeout(window.__toast); window.__toast=setTimeout(()=>toastEl.classList.add('hidden'),2800);
+}
+function showDbError(prefix, err){
+  console.error(prefix,err);
+  toast(`${prefix}: ${err?.message||'xatolik'}`);
+}
+
+async function loadAll(){
+  try{
+    const [{data:deps,error:de}, {data:emps,error:ee}, {data:att,error:ae}]=await Promise.all([
+      sb.from('departments').select('id,name').order('name'),
+      sb.from('employees').select('id,employee_code,full_name,department_id,position,phone,hire_date,is_active,departments(name)').order('id'),
+      sb.from('attendance').select('id,employee_id,attendance_date,check_in,check_out,late_minutes,worked_minutes,status,note').order('attendance_date',{ascending:false})
+    ]);
+    if(de) throw de; if(ee) throw ee; if(ae) throw ae;
+
+    data.departments=(deps||[]).map(d=>({id:d.id,name:d.name}));
+    data.employees=(emps||[]).map(e=>({
+      dbId:e.id, id:e.employee_code||`GP-${String(e.id).padStart(3,'0')}`,
+      full_name:e.full_name, first:(e.full_name||'').split(' ')[0]||'',
+      last:(e.full_name||'').split(' ').slice(1).join(' '),
+      position:e.position||'', phone:e.phone||'', hire:e.hire_date||'',
+      department:e.departments?.name||'—', department_id:e.department_id,
+      is_active:e.is_active!==false
+    }));
+    data.attendance={};
+    (att||[]).forEach(a=>{
+      if(!data.attendance[a.attendance_date]) data.attendance[a.attendance_date]={};
+      data.attendance[a.attendance_date][a.employee_id]={
+        dbId:a.id, checkIn:a.check_in?.slice(0,5)||null, checkOut:a.check_out?.slice(0,5)||null,
+        lateMinutes:a.late_minutes||0, workedMinutes:a.worked_minutes||0,
+        status:a.status||'Kelmagan', note:a.note||''
+      };
+    });
+    dbReady=true;
+    ensureToday();
+    renderAll();
+    updateDbIndicator(true);
+  }catch(err){
+    dbReady=false;
+    updateDbIndicator(false);
+    showDbError('Database ulanmagan',err);
+  }
+}
+
+function updateDbIndicator(ok){
+  const hero=document.querySelector('.hero p');
+  if(!hero) return;
+  hero.innerHTML=`Bugungi ish vaqti: <strong id="workTimeHero">${data.settings.start} — ${data.settings.end}</strong>. `
+    +(ok?'<strong style="color:#16a34a">● Real database ulangan</strong>':'<strong style="color:#dc2626">● Database ulanishini tekshiring</strong>');
+}
+
+function renderAll(){
+  ensureToday();
+  renderStats(); renderDashboardAttendance(); renderEmployees(); renderAttendance();
+  renderHistory(); renderDepartments(); fillDepartments(); renderReports();
+  document.getElementById('startTime').value=data.settings.start;
+  document.getElementById('endTime').value=data.settings.end;
+  workTimeHero.textContent=`${data.settings.start} — ${data.settings.end}`;
+}
+function renderStats(){
+  const es=data.employees.filter(e=>e.is_active), as=es.map(attendanceFor);
+  totalEmployees.textContent=es.length;
+  presentCount.textContent=as.filter(a=>a.checkIn).length;
+  absentCount.textContent=as.filter(a=>!a.checkIn).length;
+  lateCount.textContent=as.filter(a=>statusOf(a)==='late').length;
+}
+function employeeRow(e){
+  const a=attendanceFor(e),s=statusOf(a);
+  return `<tr><td><div class="person"><div class="avatar">${esc(initials(e))}</div><div><div class="person-name">${esc(fullName(e))}</div><div class="person-sub">${esc(e.position)}</div></div></div></td><td>${esc(e.department)}</td><td>${a.checkIn||'—'}</td><td>${a.checkOut||'—'}</td><td>${statusBadge(s)}</td></tr>`;
+}
+function renderDashboardAttendance(){
+  dashboardAttendance.innerHTML=data.employees.filter(e=>e.is_active).map(employeeRow).join('')
+    || `<tr><td colspan="5" class="empty">Hozircha xodimlar mavjud emas.</td></tr>`;
+}
+function renderEmployees(){
+  const q=(employeeSearch?.value||'').toLowerCase(), dep=employeeDept?.value||'';
+  const es=data.employees.filter(e=>e.is_active &&
+    `${fullName(e)} ${e.id} ${e.position}`.toLowerCase().includes(q) &&
+    (!dep||e.department===dep));
+  employeesTable.innerHTML=es.map(e=>`<tr>
+    <td><div class="person"><div class="avatar">${esc(initials(e))}</div><div><div class="person-name">${esc(fullName(e))}</div><div class="person-sub">${esc(e.phone||'Telefon kiritilmagan')}</div></div></div></td>
+    <td>${esc(e.id)}</td><td>${esc(e.department)}</td><td>${esc(e.position)}</td>
+    <td>${statusBadge(statusOf(attendanceFor(e)))}</td>
+    <td><div class="actions"><button class="btn btn-primary" onclick="openAttendanceModal(${e.dbId})">Davomat</button>
+    <button class="btn btn-danger" onclick="deleteEmployee(${e.dbId})">O‘chirish</button></div></td></tr>`).join('')
+    || `<tr><td colspan="6" class="empty">Xodim topilmadi.</td></tr>`;
+}
+function renderAttendance(){
+  const q=(attendanceSearch?.value||'').toLowerCase(),f=attendanceFilter?.value||'',dep=attendanceDept?.value||'';
+  const es=data.employees.filter(e=>e.is_active &&
+    `${fullName(e)} ${e.id}`.toLowerCase().includes(q) &&
+    (!dep||e.department===dep) && (!f||statusOf(attendanceFor(e))===f));
+  attendanceTable.innerHTML=es.map(e=>{
+    const a=attendanceFor(e),s=statusOf(a);
+    const action=!a.checkIn
+      ?`<button class="btn btn-primary" onclick="checkIn(${e.dbId})">Kelishni qayd etish</button>`
+      :!a.checkOut
+        ?`<button class="btn btn-light" onclick="checkOut(${e.dbId})">Ketishni qayd etish</button>`
+        :`<span class="badge blue">Yakunlangan</span>`;
+    return `<tr><td><div class="person"><div class="avatar">${esc(initials(e))}</div><div><div class="person-name">${esc(fullName(e))}</div><div class="person-sub">${esc(e.id)}</div></div></div></td>
+      <td>${esc(e.department)}</td><td>${a.checkIn||'—'}</td><td>${a.checkOut||'—'}</td><td>${lateText(a)}</td>
+      <td>${diffText(a.checkIn,a.checkOut)}</td><td>${statusBadge(s)}</td><td>${action}</td></tr>`;
+  }).join('')||`<tr><td colspan="8" class="empty">Xodim topilmadi.</td></tr>`;
+}
+function renderHistory(){
+  const date=historyDate.value||today(), day=data.attendance[date]||{};
+  historyTable.innerHTML=data.employees.filter(e=>e.is_active).map(e=>{
+    const a=day[e.dbId]||{},s=statusOf(a);
+    return `<tr><td>${esc(fullName(e))}</td><td>${esc(e.department)}</td><td>${a.checkIn||'—'}</td><td>${a.checkOut||'—'}</td><td>${lateText(a)}</td><td>${diffText(a.checkIn,a.checkOut)}</td><td>${statusBadge(s)}</td></tr>`;
+  }).join('')||`<tr><td colspan="7" class="empty">Ma'lumot yo‘q.</td></tr>`;
+}
+function renderDepartments(){
+  departmentGrid.innerHTML=data.departments.map(d=>{
+    const n=data.employees.filter(e=>e.department_id===d.id&&e.is_active).length;
+    return `<div class="dept"><h3>${esc(d.name)}</h3><p>Faol xodimlar</p><div class="dept-count">${n}</div></div>`;
+  }).join('');
+}
+function fillDepartments(){
+  [employeeDept,attendanceDept].forEach(sel=>{
+    if(!sel)return; const v=sel.value;
+    sel.innerHTML='<option value="">Barcha bo‘limlar</option>'+data.departments.map(d=>`<option>${esc(d.name)}</option>`).join('');
+    sel.value=v;
+  });
+  department.innerHTML=data.departments.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
+}
+function renderReports(){
+  const as=data.employees.filter(e=>e.is_active).map(attendanceFor);
+  reportTotal.textContent=data.employees.filter(e=>e.is_active).length;
+  reportPresent.textContent=as.filter(a=>a.checkIn).length;
+  reportLate.textContent=as.filter(a=>statusOf(a)==='late').length;
+  reportAbsent.textContent=as.filter(a=>!a.checkIn).length;
+}
+
+async function checkIn(dbId){
+  const e=data.employees.find(x=>x.dbId===dbId); if(!e)return;
+  const t=hm(), late=Math.max(0,mins(t)-mins(data.settings.start));
+  const payload={employee_id:dbId,attendance_date:today(),check_in:t,late_minutes:late,status:late?'Kechikdi':'Ishda'};
+  const {error}=await sb.from('attendance').upsert(payload,{onConflict:'employee_id,attendance_date'});
+  if(error){showDbError('Kelish saqlanmadi',error);return;}
+  await loadAll(); toast(`${fullName(e)} uchun kelish vaqti ${t} da qayd etildi.`);
+}
+async function checkOut(dbId){
+  const a=attendanceFor(data.employees.find(x=>x.dbId===dbId)||{});
+  if(!a?.checkIn){toast('Avval kelish vaqtini qayd eting.');return;}
+  const t=hm(), worked=Math.max(0,mins(t)-mins(a.checkIn));
+  const {error}=await sb.from('attendance').update({check_out:t,worked_minutes:worked,status:'Ishni tugatdi'}).eq('id',a.dbId);
+  if(error){showDbError('Ketish saqlanmadi',error);return;}
+  await loadAll(); toast(`Ketish vaqti ${t} da qayd etildi.`);
+}
+async function deleteEmployee(dbId){
+  const e=data.employees.find(x=>x.dbId===dbId); if(!e)return;
+  if(!confirm(`${fullName(e)} ni o‘chirishni tasdiqlaysizmi?`))return;
+  const {error}=await sb.from('employees').update({is_active:false}).eq('id',dbId);
+  if(error){showDbError('Xodim o‘chirilmadi',error);return;}
+  await loadAll(); toast('Xodim faol ro‘yxatdan chiqarildi.');
+}
+function openEmployeeModal(){
+  employeeForm.reset(); hireDate.value=today();
+  employeeId.value='GP-'+String(data.employees.length+1).padStart(3,'0');
+  fillDepartments(); employeeModal.classList.remove('hidden');
+}
+function openDeptModal(){deptForm.reset();deptModal.classList.remove('hidden')}
+function closeModal(id){document.getElementById(id).classList.add('hidden')}
+
+employeeForm.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const code=employeeId.value.trim();
+  const name=`${firstName.value.trim()} ${lastName.value.trim()}`.trim();
+  const depId=Number(department.value);
+  if(!code||!name||!depId){toast('Majburiy maydonlarni to‘ldiring.');return;}
+  const {error}=await sb.from('employees').insert({
+    employee_code:code,full_name:name,department_id:depId,position:position.value.trim(),
+    phone:phone.value.trim()||null,hire_date:hireDate.value||null,is_active:true
+  });
+  if(error){showDbError('Xodim saqlanmadi',error);return;}
+  closeModal('employeeModal'); await loadAll();
+  toast(`${name} xodimlar ro‘yxatiga va bugungi davomatga qo‘shildi.`);
+});
+
+deptForm.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const n=newDept.value.trim(); if(!n)return;
+  const {error}=await sb.from('departments').insert({name:n});
+  if(error){showDbError('Bo‘lim saqlanmadi',error);return;}
+  closeModal('deptModal'); await loadAll(); toast('Yangi bo‘lim qo‘shildi.');
+});
+
+function openAttendanceModal(preselectedDbId=''){
+  if(!data.employees.length){toast('Avval xodim qo‘shing.');return;}
+  attendanceEmployee.innerHTML=data.employees.filter(e=>e.is_active).map(e=>`<option value="${e.dbId}">${esc(fullName(e))} — ${esc(e.department)}</option>`).join('');
+  if(preselectedDbId) attendanceEmployee.value=preselectedDbId;
+  attendanceDate.value=today(); attendanceCheckIn.value=hm(); attendanceCheckOut.value='';
+  attendanceModal.classList.remove('hidden');
+}
+attendanceForm.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const dbId=Number(attendanceEmployee.value),date=attendanceDate.value,ci=attendanceCheckIn.value,co=attendanceCheckOut.value||null;
+  if(!dbId||!date||!ci)return;
+  const late=Math.max(0,mins(ci)-mins(data.settings.start));
+  const worked=co?Math.max(0,mins(co)-mins(ci)):0;
+  const {error}=await sb.from('attendance').upsert({
+    employee_id:dbId,attendance_date:date,check_in:ci,check_out:co,
+    late_minutes:late,worked_minutes:worked,status:co?'Ishni tugatdi':(late?'Kechikdi':'Ishda')
+  },{onConflict:'employee_id,attendance_date'});
+  if(error){showDbError('Davomat saqlanmadi',error);return;}
+  closeModal('attendanceModal'); await loadAll();
+  const emp=data.employees.find(x=>x.dbId===dbId); toast(`${fullName(emp)} uchun ${date} sanasiga davomat saqlandi.`);
+});
+
+function saveSettings(){
+  data.settings.start=startTime.value; data.settings.end=endTime.value;
+  localStorage.setItem('glasspro_settings',JSON.stringify(data.settings));
+  renderAll(); toast('Ish vaqti saqlandi.');
+}
+function loadSettings(){
+  try{ const s=JSON.parse(localStorage.getItem('glasspro_settings')||'null'); if(s)data.settings=s; }catch{}
+}
+function exportCSV(){
+  const rows=[['Xodim','ID','Bo‘lim','Kelish','Ketish','Kechikish','Ishlangan vaqt','Holat']];
+  data.employees.filter(e=>e.is_active).forEach(e=>{
+    const a=attendanceFor(e);
+    rows.push([fullName(e),e.id,e.department,a.checkIn||'',a.checkOut||'',lateText(a),diffText(a.checkIn,a.checkOut),
+      ({present:'Ishda',late:'Kechikdi',absent:'Kelmagan',done:'Ishni tugatdi'})[statusOf(a)]]);
+  });
+  const csv=rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n');
+  const blob=new Blob(["\ufeff"+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=`glass-pro-davomat-${today()}.csv`;a.click();URL.revokeObjectURL(url);
+}
+function showPage(page){
+  document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));
+  document.getElementById(page).classList.remove('hidden');
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
+  const titles={dashboard:'Bosh sahifa',employees:'Xodimlar',attendance:'Bugungi davomat',history:'Davomat tarixi',departments:'Bo‘limlar',reports:'Hisobotlar',settings:'Sozlamalar'};
+  pageTitle.textContent=titles[page]||'Glass Pro';
+}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+function tick(){
+  clock.textContent=nowTime();
+  dateText.textContent=new Date().toLocaleDateString('uz-UZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  workTimeHero.textContent=`${data.settings.start} — ${data.settings.end}`;
+}
+historyDate.value=today();
+loadSettings();
+setInterval(tick,1000); tick();
+loadAll();
+setInterval(()=>{ if(document.visibilityState==='visible') loadAll(); },10000);
+
+</script>
+</body>
+</html>
