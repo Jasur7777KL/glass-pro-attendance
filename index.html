@@ -119,7 +119,13 @@
     departments: [], employees: [], attendance: {}
   };
 
-  function today(){ return new Date().toLocaleDateString('en-CA'); }
+  function today(){
+    const d=new Date();
+    const y=d.getFullYear();
+    const m=String(d.getMonth()+1).padStart(2,'0');
+    const day=String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
   function nowHM(){ return new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}); }
   function nowHMS(){ return new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
   function mins(v){ if(!v)return 0; const p=v.slice(0,5).split(':').map(Number); return p[0]*60+p[1]; }
@@ -166,10 +172,12 @@
 
   function renderAll(){ renderStats();renderDash();renderEmployees();renderAttendance();renderHistory();renderDepartments();fillSelects();renderReports();document.getElementById('workTime').textContent=`${state.settings.start} — ${state.settings.end}`; }
   function renderStats(){ const a=state.employees.map(e=>attFor(e)); document.getElementById('total').textContent=state.employees.length;document.getElementById('present').textContent=a.filter(x=>x.checkIn).length;document.getElementById('absent').textContent=a.filter(x=>!x.checkIn).length;document.getElementById('late').textContent=a.filter(x=>status(x)==='late').length; }
-  function renderDash(){
-    const rows=state.employees.map(e=>{const a=attFor(e);return `<tr><td><div class="person"><div class="avatar">${esc(initials(e))}</div><div><b>${esc(name(e))}</b><div class="sub">${esc(e.position||'')}</div></div></div></td><td>${esc(e.department)}</td><td>${a.checkIn||'—'}</td><td>${a.checkOut||'—'}</td><td>${badge(status(a))}</td></tr>`}).join('');
-    document.getElementById('dashTable').innerHTML=rows||`<tr><td colspan="5" class="empty">Xodimlar mavjud emas.</td></tr>`;
-  }
+function renderDash(){
+    const todayKey=today();
+    const rows=state.employees.map(e=>{
+      const a=(state.attendance[todayKey]||{})[e.id] || {};
+      return (`<tr><td><div class="person"><div class="avatar">${esc(initials(e))}</div><div><b>${esc(name(e))}</b><div class="sub">${esc(e.position||'')}</div></div></div></td><td>${esc(e.department)}</td><td>${a.checkIn||'—'}</td><td>${a.checkOut||'—'}</td><td>${badge(status(a))}</td></tr>`);
+    }).join('');
   function renderEmployees(){
     const q=(document.getElementById('empSearch')?.value||'').toLowerCase(), dep=document.getElementById('empDept')?.value||'';
     const rows=state.employees.filter(e=>(`${name(e)} ${e.idCode} ${e.position||''}`.toLowerCase().includes(q))&&(!dep||e.department===dep)).map(e=>`<tr>
@@ -230,7 +238,7 @@
   function close(id){document.getElementById(id).classList.add('hidden');}
   function go(page){document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));document.getElementById(page).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));const t={dashboard:'Bosh sahifa',employees:'Xodimlar',attendance:'Bugungi davomat',history:'Davomat tarixi',departments:'Bo‘limlar',reports:'Hisobotlar',settings:'Sozlamalar'};document.getElementById('title').textContent=t[page]||'Glass Pro';}
   function saveSettings(){state.settings.start=document.getElementById('startTime').value;state.settings.end=document.getElementById('endTime').value;localStorage.setItem('glasspro_settings',JSON.stringify(state.settings));renderAll();toast('Ish vaqti saqlandi.');}
-  function exportCSV(){const rows=[['Xodim','ID','Bo‘lim','Kelish','Ketish','Kechikish','Ishlangan vaqt','Holat']];state.employees.forEach(e=>{const a=attFor(e);rows.push([name(e),e.idCode,e.department,a.checkIn||'',a.checkOut||'',late(a),fmtDiff(a.checkIn,a.checkOut),({present:'Ishda',late:'Kechikdi',absent:'Kelmagan',done:'Ishni tugatdi'})[status(a)]])});const csv=rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\\n');const blob=new Blob(['\\ufeff'+csv],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=`glass-pro-davomat-${today()}.csv`;a.click();URL.revokeObjectURL(u);}
+  function exportCSV(){const rows=[['Xodim','ID','Bo‘lim','Kelish','Ketish','Kechikish','Ishlangan vaqt','Holat']];state.employees.forEach(e=>{const a=attFor(e);rows.push([name(e),e.idCode,e.department,a.checkIn||'',a.checkOut||'',late(a),fmtDiff(a.checkIn,a.checkOut),({present:'Ishda',late:'Kechikdi',absent:'Kelmagan',done:'Ishni tugatdi'})[status(a)])]});const csv=rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\\n');const blob=new Blob(['\\ufeff'+csv],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=`glass-pro-davomat-${today()}.csv`;a.click();URL.revokeObjectURL(u);}
   function clockTick(){document.getElementById('clock').textContent=nowHMS();document.getElementById('date').textContent=new Date().toLocaleDateString('uz-UZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
   document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
   document.getElementById('employeeForm').addEventListener('submit',saveEmployee);
