@@ -65,6 +65,9 @@
     .field{display:grid;gap:6px}.field label{font-size:12px;font-weight:700;color:#475569}.field.full{grid-column:1/-1}
     .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
     .toast{position:fixed;right:20px;bottom:20px;background:#172033;color:#fff;padding:12px 15px;border-radius:10px;z-index:50;font-size:13px;max-width:400px;box-shadow:0 10px 35px rgba(15,23,42,.2)}
+
+    .top-actions{display:flex;align-items:center;gap:8px}.theme-toggle{border:1px solid var(--line);background:var(--card);color:var(--text);padding:9px 11px;border-radius:10px;font-size:12px;font-weight:700}
+    body.dark{--bg:#0f172a;--card:#111827;--text:#e5e7eb;--muted:#94a3b8;--line:#263247;--blue-soft:#172554}.dark .sidebar,.dark .modal-box,.dark input,.dark select,.dark .dept{background:#111827;color:var(--text)}.dark th{background:#0b1220}.dark .light{background:#172033;color:#e5e7eb;border-color:#263247}.dark .hero{background:#111827;border-color:#233a64}.dark .clock{background:#111827;color:var(--text)}
     @media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.dept-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:760px){
       .sidebar{width:72px;padding:16px 9px}.brand-text,.nav span{display:none}.nav button{text-align:center}
@@ -90,7 +93,7 @@
   <main>
     <div class="topbar">
       <div><h1 id="pageTitle">Bosh sahifa</h1><p id="todayLabel"></p></div>
-      <div class="clock" id="clock">--:--:--</div>
+      <div class="top-actions"><button class="theme-toggle" id="themeToggle" type="button" onclick="toggleTheme()">☀️ Kunduzgi</button><div class="clock" id="clock">--:--:--</div></div>
     </div>
 
     <section id="dashboard" class="page">
@@ -106,7 +109,7 @@
       </div>
       <div class="card">
         <div class="section-head"><h2>Bugungi davomat</h2><button class="btn primary" onclick="navigate('attendance')">Davomatni ochish</button></div>
-        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Kechikish</th><th>Holat</th></tr></thead><tbody id="dashboardTable"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Kechikish</th><th>Erta ketish</th><th>Overtime</th><th>Holat</th></tr></thead><tbody id="dashboardTable"></tbody></table></div>
       </div>
     </section>
 
@@ -122,14 +125,14 @@
       <div class="card">
         <div class="section-head"><h2>Bugungi davomat</h2><div class="actions"><button class="btn primary" onclick="openAttendanceModal()">+ Davomat qo‘shish</button></div></div>
         <div class="toolbar"><input id="attendanceSearch" class="search" placeholder="Xodimni qidirish..." oninput="renderAttendance()"><select id="attendanceStatusFilter" onchange="renderAttendance()"><option value="">Barcha holatlar</option><option value="present">Ishda</option><option value="late">Kechikdi</option><option value="absent">Kelmagan</option><option value="done">Ishni tugatdi</option></select><select id="attendanceDeptFilter" onchange="renderAttendance()"></select></div>
-        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Kechikish</th><th>Ishlangan vaqt</th><th>Holat</th><th>Amal</th></tr></thead><tbody id="attendanceTable"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Kechikish</th><th>Erta ketish</th><th>Overtime</th><th>Ishlangan vaqt</th><th>Holat</th><th>Amal</th></tr></thead><tbody id="attendanceTable"></tbody></table></div>
       </div>
     </section>
 
     <section id="history" class="page hidden">
       <div class="card">
         <div class="section-head"><h2>Davomat tarixi</h2><input id="historyDate" type="date" onchange="loadHistoryForDate()"></div>
-        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Kechikish</th><th>Ishlangan vaqt</th><th>Holat</th></tr></thead><tbody id="historyTable"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Kechikish</th><th>Erta ketish</th><th>Overtime</th><th>Ishlangan vaqt</th><th>Holat</th></tr></thead><tbody id="historyTable"></tbody></table></div>
       </div>
     </section>
 
@@ -153,6 +156,7 @@
         <div class="field"><label>Ish tugashi</label><input id="endTime" type="time"></div>
         <div class="field full modal-actions"><button class="btn primary" onclick="saveSettings()">Saqlash</button></div>
       </div></div>
+      <div class="card" style="margin-top:15px"><div class="section-head"><h2>Keyingi bosqich integratsiyalari</h2><span class="badge gray">Tayyorlanmoqda</span></div><div class="grid2"><div class="dept"><b>🔐 Login va rollar</b><div class="sub">Admin / Rahbar / Foydalanuvchi</div></div><div class="dept"><b>📱 QR-kod davomat</b><div class="sub">Kelish va ketishni skaner orqali qayd qilish</div></div><div class="dept"><b>💬 Telegram xabarnoma</b><div class="sub">Rahbarga kunlik hisobot</div></div><div class="dept"><b>📝 Audit log</b><div class="sub">Kim va qachon o‘zgartirganini saqlash</div></div></div></div>
     </section>
   </main>
 </div>
@@ -163,11 +167,10 @@
     <form id="employeeForm" class="form-grid">
       <div class="field"><label>Ism</label><input id="employeeFirst" required></div>
       <div class="field"><label>Familiya</label><input id="employeeLast" required></div>
-      <div class="field"><label>Xodim ID</label><input id="employeeCode" required></div>
-      <div class="field"><label>Lavozim</label><input id="employeePosition" required></div>
+      <input id="employeeCode" type="hidden"><div class="field full"><div style="padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#f8fafc;color:var(--muted);font-size:12px">Xodim ID tizim tomonidan avtomatik yaratiladi.</div></div><div class="field"><label>Lavozim</label><input id="employeePosition" required></div>
       <div class="field"><label>Bo‘lim</label><select id="employeeDepartment" required></select></div>
       <div class="field"><label>Telefon</label><input id="employeePhone"></div>
-      <div class="field"><label>Ishga qabul qilingan sana</label><input id="employeeHireDate" type="date"></div>
+      <input id="employeeHireDate" type="hidden">
       <div class="field full modal-actions"><button type="button" class="btn light" onclick="closeModal('employeeModal')">Bekor qilish</button><button class="btn primary">Saqlash</button></div>
     </form>
   </div>
@@ -253,6 +256,16 @@
     if (!checkIn) return 0;
     return Math.max(0, minutes(checkIn) - minutes(app.startTime));
   }
+
+  function earlyLeaveMinutes(checkOut) {
+    if (!checkOut) return 0;
+    return Math.max(0, minutes(app.endTime) - minutes(checkOut));
+  }
+  function overtimeMinutes(checkOut) {
+    if (!checkOut) return 0;
+    return Math.max(0, minutes(checkOut) - minutes(app.endTime));
+  }
+  function minutesText(value) { return value > 0 ? `${value} daqiqa` : '—'; }
 
   function statusFor(attendance) {
     if (!attendance || !attendance.checkIn) return 'absent';
@@ -378,13 +391,11 @@
     const today = localDateKey();
     const rows = app.employees.map(e => {
       const a = getAttendance(e.dbId, today);
+      const early=a?.checkOut?earlyLeaveMinutes(a.checkOut):0; const overtime=overtimeMinutes(a?.checkOut);
       return `<tr>
         <td><div class="person"><div class="avatar">${escapeHtml(initials(e))}</div><div><div class="person-name">${escapeHtml(employeeName(e))}</div><div class="sub">${escapeHtml(e.position)}</div></div></div></td>
-        <td>${escapeHtml(e.department)}</td>
-        <td>${a?.checkIn || '—'}</td>
-        <td>${a?.checkOut || '—'}</td>
-        <td>${a?.checkIn ? `${lateMinutes(a.checkIn)} daqiqa` : '—'}</td>
-        <td>${badge(statusFor(a))}</td>
+        <td>${escapeHtml(e.department)}</td><td>${a?.checkIn||'—'}</td><td>${a?.checkOut||'—'}</td>
+        <td>${a?.checkIn?minutesText(lateMinutes(a.checkIn)):'—'}</td><td>${minutesText(early)}</td><td>${minutesText(overtime)}</td><td>${badge(statusFor(a))}</td>
       </tr>`;
     }).join('');
     $('dashboardTable').innerHTML = rows || `<tr><td colspan="6" class="empty">Xodimlar mavjud emas.</td></tr>`;
@@ -440,15 +451,12 @@
         action = `<button class="btn light" onclick="openAttendanceModal(${e.dbId})">Tahrirlash</button>`;
       }
 
+      const early=a?.checkOut?earlyLeaveMinutes(a.checkOut):0; const overtime=overtimeMinutes(a?.checkOut);
       return `<tr>
         <td><div class="person"><div class="avatar">${escapeHtml(initials(e))}</div><div><div class="person-name">${escapeHtml(employeeName(e))}</div><div class="sub">${escapeHtml(e.code)}</div></div></div></td>
-        <td>${escapeHtml(e.department)}</td>
-        <td>${a?.checkIn || '—'}</td>
-        <td>${a?.checkOut || '—'}</td>
-        <td>${a?.checkIn ? `${lateMinutes(a.checkIn)} daqiqa` : '—'}</td>
-        <td>${workedText(a?.checkIn, a?.checkOut)}</td>
-        <td>${badge(statusFor(a))}</td>
-        <td>${action}</td>
+        <td>${escapeHtml(e.department)}</td><td>${a?.checkIn||'—'}</td><td>${a?.checkOut||'—'}</td>
+        <td>${a?.checkIn?minutesText(lateMinutes(a.checkIn)):'—'}</td><td>${minutesText(early)}</td><td>${minutesText(overtime)}</td>
+        <td>${workedText(a?.checkIn,a?.checkOut)}</td><td>${badge(statusFor(a))}</td><td>${action}</td>
       </tr>`;
     }).join('') || `<tr><td colspan="8" class="empty">Xodim topilmadi.</td></tr>`;
   }
@@ -486,15 +494,8 @@
     const map = app.attendanceByDate[date] || {};
     $('historyTable').innerHTML = app.employees.map(e => {
       const a = map[e.dbId] || null;
-      return `<tr>
-        <td>${escapeHtml(employeeName(e))}</td>
-        <td>${escapeHtml(e.department)}</td>
-        <td>${a?.checkIn || '—'}</td>
-        <td>${a?.checkOut || '—'}</td>
-        <td>${a?.checkIn ? `${lateMinutes(a.checkIn)} daqiqa` : '—'}</td>
-        <td>${workedText(a?.checkIn, a?.checkOut)}</td>
-        <td>${badge(statusFor(a))}</td>
-      </tr>`;
+      const early=a?.checkOut?earlyLeaveMinutes(a.checkOut):0; const overtime=overtimeMinutes(a?.checkOut);
+      return `<tr><td>${escapeHtml(employeeName(e))}</td><td>${escapeHtml(e.department)}</td><td>${a?.checkIn||'—'}</td><td>${a?.checkOut||'—'}</td><td>${a?.checkIn?minutesText(lateMinutes(a.checkIn)):'—'}</td><td>${minutesText(early)}</td><td>${minutesText(overtime)}</td><td>${workedText(a?.checkIn,a?.checkOut)}</td><td>${badge(statusFor(a))}</td></tr>`;
     }).join('');
   }
 
@@ -536,7 +537,7 @@
     const first = $('employeeFirst').value.trim();
     const last = $('employeeLast').value.trim();
     const fullName = `${first} ${last}`.trim();
-    const code = $('employeeCode').value.trim();
+    const code = `GP-${Date.now().toString().slice(-8)}`;
     const departmentId = Number($('employeeDepartment').value);
 
     const payload = {
@@ -757,6 +758,8 @@
     URL.revokeObjectURL(url);
   }
 
+  function applyTheme(){ const dark=localStorage.getItem('glasspro_theme')==='dark'; document.body.classList.toggle('dark',dark); $('themeToggle').textContent=dark?'🌙 Tungi rejim':'☀️ Kunduzgi'; }
+  function toggleTheme(){ const dark=document.body.classList.toggle('dark'); localStorage.setItem('glasspro_theme',dark?'dark':'light'); $('themeToggle').textContent=dark?'🌙 Tungi rejim':'☀️ Kunduzgi'; }
   function updateClock() {
     const now = new Date();
     $('clock').textContent = clockTime(now);
@@ -777,6 +780,7 @@
   $('startTime').value = app.startTime;
   $('endTime').value = app.endTime;
 
+  applyTheme();
   updateClock();
   setInterval(updateClock, 1000);
   loadAllData();
