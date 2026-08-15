@@ -1,15 +1,29 @@
-# Glass Pro — Davomat tizimi
+# Glass Pro — Davomat tizimi V2
 
-GitHub Pages uchun tayyor frontend prototip.
+Yangilangan versiya: tezkor kelish/ketish, tungi/kunduzgi rejim, kechikish, erta ketish va overtime avtomatik hisob-kitobi.
 
-## Ishga tushirish
-1. `index.html` faylini GitHub repository'ga yuklang.
-2. GitHub → Settings → Pages → Deploy from branch.
-3. Branch sifatida `main` va `/root` ni tanlang.
-4. Save bosing.
-5. GitHub Pages sizga public live link beradi.
+## Fayllar
+- index.html
+- README.md
 
-## Muhim
-Hozirgi versiya frontend demo sifatida `localStorage` orqali ma'lumotlarni saqlaydi.
-Kelish/ketish tugmalari joriy vaqtni avtomatik qayd qiladi.
-Haqiqiy xodim kelganini avtomatik aniqlash uchun keyingi bosqichda QR/RFID/turniket yoki backend integratsiyasi kerak bo'ladi.
+## GitHub Pages
+`Settings → Pages → Deploy from a branch → main → / (root)`
+
+## Supabase
+Jadvallar: `departments`, `employees`, `attendance`.
+`index.html` ichidagi `SUPABASE_URL` va `SUPABASE_ANON_KEY`ni o‘zingiznikiga almashtiring. Secret/service_role keyni frontendga qo‘ymang.
+
+## Xodim qo‘shish
+Foydalanuvchidan ID yoki ishga qabul qilingan sana so‘ralmaydi. Xodim ID tizim tomonidan avtomatik yaratiladi.
+
+## Davomat
+- Kelishni tasdiqlash
+- Ketishni tasdiqlash
+- `+ Davomat qo‘shish` orqali vaqtni qo‘lda kiritish/tahrirlash
+- 08:30 dan keyingi kelish — kechikish
+- 18:00 dan oldingi ketish — erta ketish
+- 18:00 dan keyingi ketish — overtime
+- Ishlangan vaqt avtomatik hisoblanadi
+
+## Keyingi bosqichlar
+Login va rollar, QR-kod, Telegram xabarnoma va audit log interfeysda rejalashtirilgan.
