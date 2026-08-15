@@ -1,92 +1,83 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Glass Pro — Davomat tizimi</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root{
-      --primary:#2563eb;--primary-dark:#1d4ed8;--primary-soft:#eff6ff;
-      --bg:#f6f8fc;--card:#ffffff;--text:#172033;--muted:#6b7280;
-      --line:#e7ebf3;--green:#16a34a;--yellow:#d97706;--red:#dc2626;
-      --purple:#7c3aed;--shadow:0 10px 30px rgba(15,23,42,.055);
-      --shadow-soft:0 4px 16px rgba(15,23,42,.045);
+      --primary:#2563eb;--primary-dark:#1d4ed8;--bg:#f5f7fb;--card:#fff;
+      --text:#172033;--muted:#64748b;--border:#e5e7eb;--green:#16a34a;
+      --yellow:#d97706;--red:#dc2626;--blue-soft:#eff6ff;
+      --shadow:0 8px 30px rgba(15,23,42,.06);
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
     button,input,select{font:inherit}
-    button{cursor:pointer}
+    button{cursor:pointer;border:0}
     .app{display:flex;min-height:100vh}
-    .sidebar{position:fixed;left:0;top:0;bottom:0;width:252px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-right:1px solid var(--line);padding:20px 15px;z-index:10}
-    .brand{display:flex;gap:11px;align-items:center;padding:4px 8px 28px}
-    .logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;display:grid;place-items:center;font-weight:800;box-shadow:0 8px 20px rgba(37,99,235,.22)}
-    .brand strong{display:block;font-size:17px}.brand small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
-    .nav{display:grid;gap:5px}
-    .nav button{border:0;background:transparent;color:#475569;text-align:left;padding:12px 13px;border-radius:11px;transition:.18s ease}
-    .nav button.active,.nav button:hover{background:linear-gradient(90deg,#eff6ff,#f5f3ff);color:var(--primary);font-weight:700;transform:translateX(2px)}
-    main{margin-left:252px;width:calc(100% - 252px);padding:25px 32px 34px}
-    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
-    .topbar h1{margin:0;font-size:28px;letter-spacing:-.02em}.topbar p{margin:5px 0 0;color:var(--muted);font-size:13px}
-    .clock{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-weight:800;box-shadow:var(--shadow-soft);font-variant-numeric:tabular-nums}
-    .hero{background:linear-gradient(135deg,#ffffff,#f4f7ff);border:1px solid #dfe7f7;border-radius:18px;padding:20px 21px;margin-bottom:18px;box-shadow:var(--shadow)}
-    .hero h2{margin:0 0 6px;font-size:18px}.hero p{margin:0;color:var(--muted);font-size:13px}
-    .db-ok{color:var(--green);font-weight:700}.db-bad{color:var(--red);font-weight:700}
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:18px}
-    .stat,.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
-    .stat{padding:18px;position:relative;overflow:hidden}.stat:after{content:"";position:absolute;right:-22px;top:-22px;width:74px;height:74px;border-radius:50%;background:#eff6ff}.stat:nth-child(4):after{background:#fef3c7}.stat:nth-child(3):after{background:#fee2e2}.stat-label{font-size:12px;color:var(--muted);position:relative;z-index:1}.stat-value{font-size:31px;font-weight:850;margin-top:7px;position:relative;z-index:1;font-variant-numeric:tabular-nums}
-    .card{padding:19px}
-    .section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}
-    .section-head h2{margin:0;font-size:18px}
-    .actions,.toolbar{display:flex;gap:8px;flex-wrap:wrap}
-    .btn{border:0;border-radius:9px;padding:9px 12px;font-size:13px;font-weight:700}
-    .primary{background:var(--primary);color:#fff}.primary:hover{background:var(--primary-dark)}
-    .light{background:#f8fafc;color:#334155;border:1px solid var(--line)}
-    .danger{background:#fee2e2;color:#b91c1c}
-    .search{flex:1;min-width:230px}
-    input,select{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card);color:var(--text);outline:none}
+    .sidebar{width:250px;background:#fff;border-right:1px solid var(--border);padding:22px 16px;position:fixed;left:0;top:0;bottom:0;z-index:10}
+    .brand{display:flex;align-items:center;gap:12px;padding:5px 10px 28px}
+    .brand-logo{width:42px;height:42px;border-radius:12px;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:800;font-size:20px}
+    .brand strong{display:block;font-size:17px}.brand span{font-size:12px;color:var(--muted)}
+    .nav{display:flex;flex-direction:column;gap:6px}
+    .nav button{background:transparent;color:#475569;text-align:left;padding:12px 13px;border-radius:10px;font-size:14px}
+    .nav button:hover,.nav button.active{background:var(--blue-soft);color:var(--primary);font-weight:600}
+    .main{margin-left:250px;width:calc(100% - 250px);padding:25px 30px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
+    .topbar h1{font-size:25px;margin:0 0 5px}.topbar p{margin:0;color:var(--muted);font-size:14px}
+    .clock{background:#fff;border:1px solid var(--border);padding:10px 14px;border-radius:10px;font-weight:600}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+    .stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+    .stat-label{color:var(--muted);font-size:13px}.stat-value{font-size:29px;font-weight:750;margin-top:8px}.stat-note{font-size:12px;color:var(--muted);margin-top:5px}
+    .card{background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:20px}
+    .section-head{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:16px}
+    .section-head h2{font-size:18px;margin:0}.actions{display:flex;gap:9px;flex-wrap:wrap}
+    .btn{padding:10px 14px;border-radius:9px;font-weight:600;font-size:13px}
+    .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
+    .btn-light{background:#f8fafc;color:#334155;border:1px solid var(--border)}
+    .btn-danger{background:#fee2e2;color:#b91c1c}
+    .toolbar{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+    input,select{border:1px solid var(--border);border-radius:9px;padding:10px 12px;background:#fff;outline:none}
     input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
-    .toolbar{margin-bottom:15px;padding:3px 0}
-    .table-wrap{overflow:auto}
-    table{width:100%;border-collapse:collapse;min-width:820px}
-    th,td{padding:13px 10px;text-align:left;border-bottom:1px solid #eef2f7;font-size:13px;vertical-align:middle}
-    th{color:#667085;font-weight:750;background:#f9fafc;position:sticky;top:0}
-    .person{display:flex;align-items:center;gap:10px}.avatar{width:37px;height:37px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,#dbeafe,#ede9fe);color:#3730a3;font-weight:850}
-    .person-name{font-weight:700}.sub{color:var(--muted);font-size:11px;margin-top:2px}
-    .badge{display:inline-flex;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;white-space:nowrap}
+    .search{min-width:250px;flex:1}
+    table{width:100%;border-collapse:collapse}
+    th,td{text-align:left;padding:13px 10px;border-bottom:1px solid #eef2f7;font-size:13px}
+    th{color:var(--muted);font-weight:600;background:#fafbfc}
+    .person{display:flex;align-items:center;gap:10px}.avatar{width:35px;height:35px;border-radius:50%;display:grid;place-items:center;background:#dbeafe;color:#1d4ed8;font-weight:700}
+    .person-name{font-weight:650}.person-sub{font-size:11px;color:var(--muted)}
+    .badge{display:inline-flex;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700}
     .green{background:#dcfce7;color:#15803d}.yellow{background:#fef3c7;color:#b45309}.red{background:#fee2e2;color:#b91c1c}.blue{background:#dbeafe;color:#1d4ed8}.gray{background:#f1f5f9;color:#64748b}
-    .empty{text-align:center;color:var(--muted);padding:35px}
+    .empty{text-align:center;padding:40px;color:var(--muted)}
     .hidden{display:none!important}
-    .dept-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-    .dept{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff}.dept h3{margin:0 0 4px;font-size:16px}.dept p{margin:0;color:var(--muted);font-size:12px}.dept strong{display:block;font-size:26px;margin-top:10px}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-    .modal{position:fixed;inset:0;background:rgba(15,23,42,.45);display:grid;place-items:center;padding:20px;z-index:30}
-    .modal-box{width:min(580px,100%);background:#fff;border-radius:15px;padding:21px}
-    .modal-head{display:flex;justify-content:space-between;align-items:center}.modal-head h2{margin:0;font-size:19px}.close{border:0;background:#f1f5f9;border-radius:9px;width:34px;height:34px;font-size:20px}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px}
-    .field{display:grid;gap:6px}.field label{font-size:12px;font-weight:700;color:#475569}.field.full{grid-column:1/-1}
-    .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
-    .toast{position:fixed;right:20px;bottom:20px;background:#172033;color:#fff;padding:12px 15px;border-radius:10px;z-index:50;font-size:13px;max-width:400px;box-shadow:0 10px 35px rgba(15,23,42,.2)}
-
-    .top-actions{display:flex;align-items:center;gap:8px}.theme-toggle{border:1px solid var(--line);background:var(--card);color:var(--text);padding:9px 11px;border-radius:10px;font-size:12px;font-weight:700}
-    body.dark{--bg:#0d1423;--card:#111a2b;--text:#e7edf7;--muted:#9aa8bd;--line:#243148;--blue-soft:#16234a}
-    body.dark .sidebar{background:rgba(17,26,43,.94)}
-    body.dark .hero{background:linear-gradient(135deg,#121c30,#0f1728);border-color:#243a66}
-    body.dark th{background:#0f1728;color:#9aa8bd}
-    body.dark td{border-bottom-color:#1e2a3d}
-    body.dark .stat:after{opacity:.18}.dark .sidebar,.dark .modal-box,.dark input,.dark select,.dark .dept{background:#111827;color:var(--text)}.dark th{background:#0b1220}.dark .light{background:#172033;color:#e5e7eb;border-color:#263247}.dark .hero{background:#111827;border-color:#233a64}.dark .clock{background:#111827;color:var(--text)}
-    @media(max-width:1100px){.stats{grid-template-columns:repeat(2,1fr)}.dept-grid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:860px){.top-actions{gap:5px}.theme-toggle{font-size:11px;padding:8px 9px}}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .dept-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+    .dept{padding:18px;border:1px solid var(--border);border-radius:13px;background:#fff}
+    .dept h3{margin:0 0 7px;font-size:16px}.dept p{margin:0;color:var(--muted);font-size:13px}.dept-count{font-size:26px;font-weight:750;margin-top:14px}
+    .modal{position:fixed;inset:0;background:rgba(15,23,42,.42);display:grid;place-items:center;padding:20px;z-index:50}
+    .modal-box{background:#fff;width:min(560px,100%);border-radius:16px;padding:22px;box-shadow:0 20px 60px rgba(15,23,42,.2)}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-head h2{margin:0;font-size:19px}
+    .close{background:#f1f5f9;width:34px;height:34px;border-radius:9px;font-size:20px}
+    .form{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;color:#475569;font-weight:600}
+    .modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
+    .toast{position:fixed;right:22px;bottom:22px;background:#172033;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:var(--shadow);z-index:100;font-size:13px}
+    .hero{background:linear-gradient(135deg,#eff6ff,#fff);border:1px solid #dbeafe;border-radius:15px;padding:20px;margin-bottom:18px}
+    .hero h2{margin:0 0 6px;font-size:19px}.hero p{margin:0;color:#64748b;font-size:13px}
+    @media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.dept-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:760px){
-      .sidebar{width:72px;padding:16px 9px}.brand-text,.nav span{display:none}.nav button{text-align:center}
-      main{margin-left:72px;width:calc(100% - 72px);padding:18px}.grid2{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}
+      .sidebar{width:72px;padding:16px 10px}.brand div:not(.brand-logo),.nav button span{display:none}.brand{padding:5px 5px 25px}.nav button{text-align:center}
+      .main{margin-left:72px;width:calc(100% - 72px);padding:18px}.grid2{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}
+      .table-wrap{overflow:auto}table{min-width:800px}.form{grid-template-columns:1fr}
     }
   </style>
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
-    <div class="brand"><div class="logo">GP</div><div class="brand-text"><strong>Glass Pro</strong><small>Davomat tizimi</small></div></div>
+    <div class="brand">
+      <div class="brand-logo">GP</div>
+      <div><strong>Glass Pro</strong><span>Davomat tizimi</span></div>
+    </div>
     <nav class="nav">
       <button class="active" data-page="dashboard">🏠 <span>Bosh sahifa</span></button>
       <button data-page="employees">👥 <span>Xodimlar</span></button>
@@ -98,114 +89,112 @@
     </nav>
   </aside>
 
-  <main>
+  <main class="main">
     <div class="topbar">
-      <div><h1 id="pageTitle">Bosh sahifa</h1><p id="todayLabel"></p></div>
-      <div class="top-actions"><button class="theme-toggle" id="themeToggle" type="button" onclick="toggleTheme()">☀️ Kunduzgi</button><div class="clock" id="clock">--:--:--</div></div>
+      <div><h1 id="pageTitle">Bosh sahifa</h1><p id="dateText"></p></div>
+      <div class="clock" id="clock">--:--:--</div>
     </div>
 
     <section id="dashboard" class="page">
       <div class="hero">
-        <h2>Glass Pro xodimlar va davomat boshqaruv tizimi</h2>
-        <p>Ish vaqti: <strong id="workTime">08:30 — 18:00</strong> · <span id="dbStatus">Database tekshirilmoqda...</span></p>
+        <h2>Glass Pro xodimlar va davomat boshqaruvi</h2>
+        <p>Bugungi ish vaqti: <strong id="workTimeHero">08:30 — 18:00</strong>. Davomat ma’lumotlari real vaqtga yaqin tarzda yangilanadi.</p>
       </div>
       <div class="stats">
-        <div class="stat"><div class="stat-label">Jami xodimlar</div><div class="stat-value" id="statTotal">0</div></div>
-        <div class="stat"><div class="stat-label">Bugun kelganlar</div><div class="stat-value" id="statPresent">0</div></div>
-        <div class="stat"><div class="stat-label">Kelmaganlar</div><div class="stat-value" id="statAbsent">0</div></div>
-        <div class="stat"><div class="stat-label">Kechikkanlar</div><div class="stat-value" id="statLate">0</div></div>
+        <div class="stat"><div class="stat-label">Jami xodimlar</div><div class="stat-value" id="totalEmployees">0</div><div class="stat-note">Faol xodimlar</div></div>
+        <div class="stat"><div class="stat-label">Bugun kelganlar</div><div class="stat-value" id="presentCount">0</div><div class="stat-note">Kelish qayd etilgan</div></div>
+        <div class="stat"><div class="stat-label">Kelmaganlar</div><div class="stat-value" id="absentCount">0</div><div class="stat-note">Hali kelish qayd etilmagan</div></div>
+        <div class="stat"><div class="stat-label">Kechikkanlar</div><div class="stat-value" id="lateCount">0</div><div class="stat-note">08:30 dan keyin</div></div>
       </div>
       <div class="card">
-        <div class="section-head"><div><h2>Bugungi davomat</h2><div class="sub" style="margin-top:5px">Xodimlarni tezkor nazorat qilish va kelish/ketishni qayd etish</div></div><button class="btn primary" onclick="navigate('attendance')">Davomatni ochish</button></div>
-        <div class="summary-strip" style="display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px">
-          <span class="badge green">Vaqtida</span><span class="badge yellow">Kechikdi</span><span class="badge red">Kelmagan</span><span class="badge blue">Ishni tugatdi</span>
-        </div>
-        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Kechikish</th><th>Erta ketish</th><th>Overtime</th><th>Holat</th></tr></thead><tbody id="dashboardTable"></tbody></table></div>
+        <div class="section-head"><h2>Bugungi davomat</h2><div class="actions"><button class="btn btn-primary" onclick="showPage('attendance')">Barchasini ko‘rish</button></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Holat</th></tr></thead><tbody id="dashboardAttendance"></tbody></table></div>
       </div>
     </section>
 
     <section id="employees" class="page hidden">
       <div class="card">
-        <div class="section-head"><h2>Xodimlar ro‘yxati</h2><button class="btn primary" onclick="openEmployeeModal()">+ Xodim qo‘shish</button></div>
-        <div class="toolbar"><input id="employeeSearch" class="search" placeholder="Ism, ID yoki lavozim..." oninput="renderEmployees()"><select id="employeeDeptFilter" onchange="renderEmployees()"></select></div>
-        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>ID</th><th>Bo‘lim</th><th>Lavozim</th><th>Bugungi holat</th><th>Amal</th></tr></thead><tbody id="employeesTable"></tbody></table></div>
+        <div class="section-head"><h2>Xodimlar ro‘yxati</h2><button class="btn btn-primary" onclick="openEmployeeModal()">+ Xodim qo‘shish</button></div>
+        <div class="toolbar"><input class="search" id="employeeSearch" placeholder="Ism, familiya yoki ID bo‘yicha qidirish..." oninput="renderEmployees()"><select id="employeeDept" onchange="renderEmployees()"><option value="">Barcha bo‘limlar</option></select></div>
+        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>ID</th><th>Bo‘lim</th><th>Lavozim</th><th>Holat</th><th>Amallar</th></tr></thead><tbody id="employeesTable"></tbody></table></div>
       </div>
     </section>
 
     <section id="attendance" class="page hidden">
       <div class="card">
-        <div class="section-head"><h2>Bugungi davomat</h2><div class="actions"><button class="btn primary" onclick="openAttendanceModal()">+ Davomat qo‘shish</button></div></div>
-        <div class="toolbar"><input id="attendanceSearch" class="search" placeholder="Xodimni qidirish..." oninput="renderAttendance()"><select id="attendanceStatusFilter" onchange="renderAttendance()"><option value="">Barcha holatlar</option><option value="present">Ishda</option><option value="late">Kechikdi</option><option value="absent">Kelmagan</option><option value="done">Ishni tugatdi</option></select><select id="attendanceDeptFilter" onchange="renderAttendance()"></select></div>
-        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Kechikish</th><th>Erta ketish</th><th>Overtime</th><th>Ishlangan vaqt</th><th>Holat</th><th>Amal</th></tr></thead><tbody id="attendanceTable"></tbody></table></div>
+        <div class="section-head"><h2>Bugungi davomat</h2><div class="actions"><button class="btn btn-primary" onclick="openAttendanceModal()">+ Davomat qo‘shish</button><button class="btn btn-light" onclick="resetToday()">Demo kunini tozalash</button></div></div>
+        <div class="toolbar"><input class="search" id="attendanceSearch" placeholder="Xodimni qidirish..." oninput="renderAttendance()"><select id="attendanceFilter" onchange="renderAttendance()"><option value="">Barcha holatlar</option><option value="present">Ishda</option><option value="late">Kechikdi</option><option value="absent">Kelmagan</option><option value="done">Ishni tugatdi</option></select><select id="attendanceDept" onchange="renderAttendance()"><option value="">Barcha bo‘limlar</option></select></div>
+        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Kechikish</th><th>Ishlangan vaqt</th><th>Holat</th><th>Amal</th></tr></thead><tbody id="attendanceTable"></tbody></table></div>
       </div>
     </section>
 
     <section id="history" class="page hidden">
       <div class="card">
-        <div class="section-head"><h2>Davomat tarixi</h2><input id="historyDate" type="date" onchange="loadHistoryForDate()"></div>
-        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Kechikish</th><th>Erta ketish</th><th>Overtime</th><th>Ishlangan vaqt</th><th>Holat</th></tr></thead><tbody id="historyTable"></tbody></table></div>
+        <div class="section-head"><h2>Davomat tarixi</h2><input type="date" id="historyDate" onchange="renderHistory()"></div>
+        <div class="table-wrap"><table><thead><tr><th>Xodim</th><th>Bo‘lim</th><th>Kelish</th><th>Ketish</th><th>Kechikish</th><th>Ishlangan vaqt</th><th>Holat</th></tr></thead><tbody id="historyTable"></tbody></table></div>
       </div>
     </section>
 
     <section id="departments" class="page hidden">
       <div class="card">
-        <div class="section-head"><h2>Bo‘limlar</h2><button class="btn primary" onclick="openDepartmentModal()">+ Bo‘lim qo‘shish</button></div>
-        <div id="departmentGrid" class="dept-grid"></div>
+        <div class="section-head"><h2>Bo‘limlar</h2><button class="btn btn-primary" onclick="openDeptModal()">+ Bo‘lim qo‘shish</button></div>
+        <div class="dept-grid" id="departmentGrid"></div>
       </div>
     </section>
 
     <section id="reports" class="page hidden">
       <div class="grid2">
-        <div class="card"><h2>Bugungi ko‘rsatkichlar</h2><p>Jami xodimlar: <strong id="reportTotal">0</strong></p><p>Kelganlar: <strong id="reportPresent">0</strong></p><p>Kechikkanlar: <strong id="reportLate">0</strong></p><p>Kelmaganlar: <strong id="reportAbsent">0</strong></p></div>
-        <div class="card"><h2>Eksport</h2><p style="color:#64748b;font-size:13px">Bugungi davomatni CSV ko‘rinishida yuklab oling.</p><button class="btn primary" onclick="exportCSV()">CSV yuklab olish</button></div>
+        <div class="card"><h2>Umumiy ko‘rsatkichlar</h2><p>Jami xodimlar: <strong id="reportTotal">0</strong></p><p>Bugun kelganlar: <strong id="reportPresent">0</strong></p><p>Kechikkanlar: <strong id="reportLate">0</strong></p><p>Kelmaganlar: <strong id="reportAbsent">0</strong></p></div>
+        <div class="card"><h2>Eksport</h2><p style="color:#64748b;font-size:13px">Bugungi davomatni CSV formatida yuklab oling.</p><button class="btn btn-primary" onclick="exportCSV()">CSV yuklab olish</button></div>
       </div>
     </section>
 
     <section id="settings" class="page hidden">
-      <div class="card"><h2>Ish vaqti</h2><div class="form-grid">
-        <div class="field"><label>Ish boshlanishi</label><input id="startTime" type="time"></div>
-        <div class="field"><label>Ish tugashi</label><input id="endTime" type="time"></div>
-        <div class="field full modal-actions"><button class="btn primary" onclick="saveSettings()">Saqlash</button></div>
-      </div></div>
-      <div class="card" style="margin-top:15px"><div class="section-head"><h2>Keyingi bosqich integratsiyalari</h2><span class="badge gray">Tayyorlanmoqda</span></div><div class="grid2"><div class="dept"><b>🔐 Login va rollar</b><div class="sub">Admin / Rahbar / Foydalanuvchi</div></div><div class="dept"><b>📱 QR-kod davomat</b><div class="sub">Kelish va ketishni skaner orqali qayd qilish</div></div><div class="dept"><b>💬 Telegram xabarnoma</b><div class="sub">Rahbarga kunlik hisobot</div></div><div class="dept"><b>📝 Audit log</b><div class="sub">Kim va qachon o‘zgartirganini saqlash</div></div></div></div>
+      <div class="card">
+        <div class="section-head"><h2>Sozlamalar</h2></div>
+        <div class="form">
+          <div class="field"><label>Ish boshlanish vaqti</label><input type="time" id="startTime"></div>
+          <div class="field"><label>Ish tugash vaqti</label><input type="time" id="endTime"></div>
+          <div class="field full"><button class="btn btn-primary" onclick="saveSettings()">Sozlamalarni saqlash</button></div>
+        </div>
+      </div>
     </section>
   </main>
 </div>
 
 <div class="modal hidden" id="employeeModal">
   <div class="modal-box">
-    <div class="modal-head"><h2>Xodim qo‘shish</h2><button class="close" onclick="closeModal('employeeModal')">×</button></div>
-    <form id="employeeForm" class="form-grid">
-      <div class="field"><label>Ism</label><input id="employeeFirst" required></div>
-      <div class="field"><label>Familiya</label><input id="employeeLast" required></div>
-      <input id="employeeCode" type="hidden"><div class="field full"><div style="padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#f8fafc;color:var(--muted);font-size:12px">Xodim ID tizim tomonidan avtomatik yaratiladi.</div></div><div class="field"><label>Lavozim</label><input id="employeePosition" required></div>
-      <div class="field"><label>Bo‘lim</label><select id="employeeDepartment" required></select></div>
-      <div class="field"><label>Telefon</label><input id="employeePhone"></div>
-      <input id="employeeHireDate" type="hidden">
-      <div class="field full modal-actions"><button type="button" class="btn light" onclick="closeModal('employeeModal')">Bekor qilish</button><button class="btn primary">Saqlash</button></div>
+    <div class="modal-head"><h2>Yangi xodim qo‘shish</h2><button class="close" onclick="closeModal('employeeModal')">×</button></div>
+    <form class="form" id="employeeForm">
+      <div class="field"><label>Ism</label><input id="firstName" required></div>
+      <div class="field"><label>Familiya</label><input id="lastName" required></div>
+      <div class="field"><label>Xodim ID</label><input id="employeeId" placeholder="GP-001" required></div>
+      <div class="field"><label>Lavozim</label><input id="position" required></div>
+      <div class="field"><label>Bo‘lim</label><select id="department" required></select></div>
+      <div class="field"><label>Telefon</label><input id="phone"></div>
+      <div class="field"><label>Ishga qabul qilingan sana</label><input type="date" id="hireDate"></div>
+      <div class="modal-actions full"><button type="button" class="btn btn-light" onclick="closeModal('employeeModal')">Bekor qilish</button><button class="btn btn-primary">Saqlash</button></div>
     </form>
+  </div>
+</div>
+
+<div class="modal hidden" id="deptModal">
+  <div class="modal-box">
+    <div class="modal-head"><h2>Yangi bo‘lim</h2><button class="close" onclick="closeModal('deptModal')">×</button></div>
+    <form id="deptForm"><div class="field"><label>Bo‘lim nomi</label><input id="newDept" required></div><div class="modal-actions"><button type="button" class="btn btn-light" onclick="closeModal('deptModal')">Bekor qilish</button><button class="btn btn-primary">Saqlash</button></div></form>
   </div>
 </div>
 
 <div class="modal hidden" id="attendanceModal">
   <div class="modal-box">
-    <div class="modal-head"><h2>Davomat qo‘shish / o‘zgartirish</h2><button class="close" onclick="closeModal('attendanceModal')">×</button></div>
-    <form id="attendanceForm" class="form-grid">
+    <div class="modal-head"><h2>Davomat qo‘shish</h2><button class="close" onclick="closeModal('attendanceModal')">×</button></div>
+    <form class="form" id="attendanceForm">
       <div class="field full"><label>Xodim</label><select id="attendanceEmployee" required></select></div>
-      <div class="field"><label>Sana</label><input id="attendanceDate" type="date" required></div>
-      <div class="field"><label>Kelgan vaqt</label><input id="attendanceCheckIn" type="time" required></div>
-      <div class="field"><label>Ketgan vaqt</label><input id="attendanceCheckOut" type="time"></div>
-      <div class="field full modal-actions"><button type="button" class="btn light" onclick="closeModal('attendanceModal')">Bekor qilish</button><button class="btn primary">Saqlash</button></div>
-    </form>
-  </div>
-</div>
-
-<div class="modal hidden" id="departmentModal">
-  <div class="modal-box">
-    <div class="modal-head"><h2>Bo‘lim qo‘shish</h2><button class="close" onclick="closeModal('departmentModal')">×</button></div>
-    <form id="departmentForm" class="form-grid">
-      <div class="field full"><label>Bo‘lim nomi</label><input id="newDepartmentName" required></div>
-      <div class="field full modal-actions"><button type="button" class="btn light" onclick="closeModal('departmentModal')">Bekor qilish</button><button class="btn primary">Saqlash</button></div>
+      <div class="field"><label>Sana</label><input type="date" id="attendanceDate" required></div>
+      <div class="field"><label>Kelgan vaqt</label><input type="time" id="attendanceCheckIn" required></div>
+      <div class="field"><label>Ketgan vaqt (ixtiyoriy)</label><input type="time" id="attendanceCheckOut"></div>
+      <div class="field full"><small style="color:#64748b">08:30 dan keyingi kelish avtomatik ravishda “Kechikdi” deb belgilanadi.</small></div>
+      <div class="modal-actions full"><button type="button" class="btn btn-light" onclick="closeModal('attendanceModal')">Bekor qilish</button><button class="btn btn-primary">Saqlash</button></div>
     </form>
   </div>
 </div>
@@ -213,615 +202,144 @@
 <div id="toast" class="toast hidden"></div>
 
 <script>
-  /* ==============================
-     SUPABASE SOZLAMALARI
-     ==============================
-     Shu ikki qiymatni o'zingiznikiga almashtiring.
-     SUPABASE_ANON_KEY uchun faqat anon/public yoki Publishable key ishlating.
-     Secret/service_role keyni frontendga qo'ymang.
-  */
-  const SUPABASE_URL = 'https://ejgvigqruszjfvoavgvn.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_fx9VCYpNy3hcBvymmM39fw_OPSfP-OF';
-
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  const app = {
-    startTime: localStorage.getItem('glasspro_start_time') || '08:30',
-    endTime: localStorage.getItem('glasspro_end_time') || '18:00',
-    departments: [],
-    employees: [],
-    attendanceByDate: {},
-    loading: false
-  };
-
-  const $ = id => document.getElementById(id);
-
-  function localDateKey(date = new Date()) {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  }
-
-  function localTimeKey(date = new Date()) {
-    return `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
-  }
-
-  function clockTime(date = new Date()) {
-    return `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}:${String(date.getSeconds()).padStart(2,'0')}`;
-  }
-
-  function minutes(time) {
-    if (!time) return 0;
-    const [h,m] = time.slice(0,5).split(':').map(Number);
-    return h*60+m;
-  }
-
-  function workedText(checkIn, checkOut) {
-    if (!checkIn || !checkOut) return '—';
-    const total = Math.max(0, minutes(checkOut) - minutes(checkIn));
-    return `${Math.floor(total/60)} soat ${total%60} daqiqa`;
-  }
-
-  function lateMinutes(checkIn) {
-    if (!checkIn) return 0;
-    return Math.max(0, minutes(checkIn) - minutes(app.startTime));
-  }
-
-  function durationText(totalMinutes) {
-    const m = Math.max(0, Number(totalMinutes) || 0);
-    if (m < 60) return `${m} daqiqa`;
-    const h = Math.floor(m / 60), r = m % 60;
-    return r ? `${h} soat ${r} daqiqa` : `${h} soat`;
-  }
-
-  function earlyLeaveText(checkOut) {
-    const m = earlyLeaveMinutes(checkOut);
-    return m > 0 ? durationText(m) : '—';
-  }
-
-  function overtimeText(checkIn, checkOut) {
-    const m = overtimeMinutes(checkIn, checkOut);
-    return m > 0 ? durationText(m) : '—';
-  }
-
-  function lateText(checkIn) {
-    const m = lateMinutes(checkIn);
-    return checkIn ? durationText(m) : '—';
-  }
-
-  function earlyLeaveMinutes(checkOut) {
-    if (!checkOut) return 0;
-    return Math.max(0, minutes(app.endTime) - minutes(checkOut));
-  }
-  function overtimeMinutes(checkOut) {
-    if (!checkOut) return 0;
-    return Math.max(0, minutes(checkOut) - minutes(app.endTime));
-  }
-  function minutesText(value) { return value > 0 ? `${value} daqiqa` : '—'; }
-
-  function statusFor(attendance) {
-    if (!attendance || !attendance.checkIn) return 'absent';
-    if (attendance.checkOut) return 'done';
-    return lateMinutes(attendance.checkIn) > 0 ? 'late' : 'present';
-  }
-
-  function badge(status) {
-    const map = {
-      present:['Ishda','green'],
-      late:['Kechikdi','yellow'],
-      absent:['Kelmagan','red'],
-      done:['Ishni tugatdi','blue']
-    };
-    const x = map[status] || ['—','gray'];
-    return `<span class="badge ${x[1]}">${x[0]}</span>`;
-  }
-
-  function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, c => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    }[c]));
-  }
-
-  function employeeName(employee) {
-    return employee.full_name || '';
-  }
-
-  function initials(employee) {
-    return employeeName(employee).split(/\s+/).filter(Boolean).slice(0,2).map(x => x[0]).join('').toUpperCase();
-  }
-
-  function getAttendance(employeeId, date = localDateKey()) {
-    return (app.attendanceByDate[date] || {})[employeeId] || null;
-  }
-
-  function toast(message) {
-    $('toast').textContent = message;
-    $('toast').classList.remove('hidden');
-    clearTimeout(window.__toastTimer);
-    window.__toastTimer = setTimeout(() => $('toast').classList.add('hidden'), 3200);
-  }
-
-  function dbError(prefix, error) {
-    console.error(prefix, error);
-    toast(`${prefix}: ${error?.message || 'nomaʼlum xatolik'}`);
-  }
-
-  async function loadAllData() {
-    if (app.loading) return;
-    app.loading = true;
-    try {
-      const [deps, employees, attendance] = await Promise.all([
-        supabaseClient.from('departments').select('id,name').order('name'),
-        supabaseClient.from('employees').select('id,employee_code,full_name,department_id,position,phone,hire_date,is_active,departments(name)').eq('is_active', true).order('id'),
-        supabaseClient.from('attendance').select('id,employee_id,attendance_date,check_in,check_out,late_minutes,worked_minutes,status,note').order('attendance_date', {ascending:false})
-      ]);
-
-      if (deps.error) throw deps.error;
-      if (employees.error) throw employees.error;
-      if (attendance.error) throw attendance.error;
-
-      app.departments = (deps.data || []).map(x => ({id:x.id, name:x.name}));
-      app.employees = (employees.data || []).map(x => ({
-        dbId:x.id,
-        code:x.employee_code || `GP-${x.id}`,
-        full_name:x.full_name,
-        department_id:x.department_id,
-        department:x.departments?.name || '—',
-        position:x.position || '',
-        phone:x.phone || '',
-        hire_date:x.hire_date || ''
-      }));
-
-      app.attendanceByDate = {};
-      for (const row of (attendance.data || [])) {
-        if (!app.attendanceByDate[row.attendance_date]) app.attendanceByDate[row.attendance_date] = {};
-        app.attendanceByDate[row.attendance_date][row.employee_id] = {
-          dbId:row.id,
-          checkIn:row.check_in ? row.check_in.slice(0,5) : '',
-          checkOut:row.check_out ? row.check_out.slice(0,5) : '',
-          lateMinutes:row.late_minutes || 0,
-          workedMinutes:row.worked_minutes || 0,
-          status:row.status || ''
-        };
-      }
-
-      $('dbStatus').textContent = '● Real database ulangan';
-      $('dbStatus').className = 'db-ok';
-      renderAll();
-    } catch (error) {
-      $('dbStatus').textContent = '● Database bilan ulanishda xatolik';
-      $('dbStatus').className = 'db-bad';
-      dbError('Database yuklanmadi', error);
-    } finally {
-      app.loading = false;
-    }
-  }
-
-  function renderAll() {
-    $('workTime').textContent = `${app.startTime} — ${app.endTime}`;
-    $('startTime').value = app.startTime;
-    $('endTime').value = app.endTime;
-    renderStats();
-    renderDashboard();
-    renderEmployees();
-    renderAttendance();
-    fillDepartmentSelectors();
-    renderDepartments();
-    renderReports();
-  }
-
-  function renderStats() {
-    const today = localDateKey();
-    const records = app.employees.map(e => getAttendance(e.dbId, today));
-    $('statTotal').textContent = app.employees.length;
-    $('statPresent').textContent = records.filter(x => x?.checkIn).length;
-    $('statAbsent').textContent = records.filter(x => !x?.checkIn).length;
-    $('statLate').textContent = records.filter(x => statusFor(x) === 'late').length;
-  }
-
-  function renderDashboard() {
-    const today = localDateKey();
-    const rows = app.employees.map(e => {
-      const a = getAttendance(e.dbId, today);
-      const early=a?.checkOut?earlyLeaveMinutes(a.checkOut):0; const overtime=overtimeMinutes(a?.checkOut);
-      return `<tr>
-        <td><div class="person"><div class="avatar">${escapeHtml(initials(e))}</div><div><div class="person-name">${escapeHtml(employeeName(e))}</div><div class="sub">${escapeHtml(e.position)}</div></div></div></td>
-        <td>${escapeHtml(e.department)}</td><td>${a?.checkIn||'—'}</td><td>${a?.checkOut||'—'}</td>
-        <td>${a?.checkIn?minutesText(lateMinutes(a.checkIn)):'—'}</td><td>${minutesText(early)}</td><td>${minutesText(overtime)}</td><td>${badge(statusFor(a))}</td>
-      </tr>`;
-    }).join('');
-    $('dashboardTable').innerHTML = rows || `<tr><td colspan="8" class="empty">Xodimlar mavjud emas.</td></tr>`;
-  }
-
-  function renderEmployees() {
-    const q = ($('employeeSearch').value || '').toLowerCase();
-    const dept = $('employeeDeptFilter').value || '';
-    const today = localDateKey();
-
-    const filtered = app.employees.filter(e =>
-      `${employeeName(e)} ${e.code} ${e.position}`.toLowerCase().includes(q) &&
-      (!dept || e.department === dept)
-    );
-
-    $('employeesTable').innerHTML = filtered.map(e => {
-      const a = getAttendance(e.dbId, today);
-      return `<tr>
-        <td><div class="person"><div class="avatar">${escapeHtml(initials(e))}</div><div><div class="person-name">${escapeHtml(employeeName(e))}</div><div class="sub">${escapeHtml(e.phone || 'Telefon kiritilmagan')}</div></div></div></td>
-        <td>${escapeHtml(e.code)}</td>
-        <td>${escapeHtml(e.department)}</td>
-        <td>${escapeHtml(e.position)}</td>
-        <td>${badge(statusFor(a))}</td>
-        <td><div class="actions">
-          <button class="btn primary" onclick="openAttendanceModal(${e.dbId})">Davomat</button>
-          <button class="btn danger" onclick="deactivateEmployee(${e.dbId})">O‘chirish</button>
-        </div></td>
-      </tr>`;
-    }).join('') || `<tr><td colspan="6" class="empty">Xodim topilmadi.</td></tr>`;
-  }
-
-  function renderAttendance() {
-    const q = ($('attendanceSearch').value || '').toLowerCase();
-    const statusFilter = $('attendanceStatusFilter').value || '';
-    const dept = $('attendanceDeptFilter').value || '';
-    const today = localDateKey();
-
-    const filtered = app.employees.filter(e => {
-      const a = getAttendance(e.dbId, today);
-      return `${employeeName(e)} ${e.code}`.toLowerCase().includes(q) &&
-             (!statusFilter || statusFor(a) === statusFilter) &&
-             (!dept || e.department === dept);
-    });
-
-    $('attendanceTable').innerHTML = filtered.map(e => {
-      const a = getAttendance(e.dbId, today);
-      let action = '';
-      if (!a?.checkIn) {
-        action = `<button class="btn primary" onclick="recordCheckIn(${e.dbId})">Kelishni qayd etish</button>`;
-      } else if (!a?.checkOut) {
-        action = `<button class="btn light" onclick="recordCheckOut(${e.dbId})">Ketishni qayd etish</button>`;
-      } else {
-        action = `<button class="btn light" onclick="openAttendanceModal(${e.dbId})">Tahrirlash</button>`;
-      }
-
-      const early=a?.checkOut?earlyLeaveMinutes(a.checkOut):0; const overtime=overtimeMinutes(a?.checkOut);
-      return `<tr>
-        <td><div class="person"><div class="avatar">${escapeHtml(initials(e))}</div><div><div class="person-name">${escapeHtml(employeeName(e))}</div><div class="sub">${escapeHtml(e.code)}</div></div></div></td>
-        <td>${escapeHtml(e.department)}</td><td>${a?.checkIn||'—'}</td><td>${a?.checkOut||'—'}</td>
-        <td>${a?.checkIn?minutesText(lateMinutes(a.checkIn)):'—'}</td><td>${minutesText(early)}</td><td>${minutesText(overtime)}</td>
-        <td>${workedText(a?.checkIn,a?.checkOut)}</td><td>${badge(statusFor(a))}</td><td>${action}</td>
-      </tr>`;
-    }).join('') || `<tr><td colspan="10" class="empty">Xodim topilmadi.</td></tr>`;
-  }
-
-  async function loadHistoryForDate() {
-    const selected = $('historyDate').value;
-    if (!selected) return;
-
-    const {data, error} = await supabaseClient
-      .from('attendance')
-      .select('id,employee_id,attendance_date,check_in,check_out,late_minutes,worked_minutes,status')
-      .eq('attendance_date', selected);
-
-    if (error) {
-      dbError('Davomat tarixi yuklanmadi', error);
-      return;
-    }
-
-    app.attendanceByDate[selected] = {};
-    for (const row of (data || [])) {
-      app.attendanceByDate[selected][row.employee_id] = {
-        dbId:row.id,
-        checkIn:row.check_in ? row.check_in.slice(0,5) : '',
-        checkOut:row.check_out ? row.check_out.slice(0,5) : '',
-        lateMinutes:row.late_minutes || 0,
-        workedMinutes:row.worked_minutes || 0,
-        status:row.status || ''
-      };
-    }
-
-    renderHistoryTable(selected);
-  }
-
-  function renderHistoryTable(date) {
-    const map = app.attendanceByDate[date] || {};
-    $('historyTable').innerHTML = app.employees.map(e => {
-      const a = map[e.dbId] || null;
-      const early=a?.checkOut?earlyLeaveMinutes(a.checkOut):0; const overtime=overtimeMinutes(a?.checkOut);
-      return `<tr><td>${escapeHtml(employeeName(e))}</td><td>${escapeHtml(e.department)}</td><td>${a?.checkIn||'—'}</td><td>${a?.checkOut||'—'}</td><td>${a?.checkIn?minutesText(lateMinutes(a.checkIn)):'—'}</td><td>${minutesText(early)}</td><td>${minutesText(overtime)}</td><td>${workedText(a?.checkIn,a?.checkOut)}</td><td>${badge(statusFor(a))}</td></tr>`;
-    }).join('');
-  }
-
-  function fillDepartmentSelectors() {
-    const options = app.departments.map(d => `<option value="${escapeHtml(d.name)}">${escapeHtml(d.name)}</option>`).join('');
-
-    const empCurrent = $('employeeDeptFilter').value;
-    $('employeeDeptFilter').innerHTML = `<option value="">Barcha bo‘limlar</option>${options}`;
-    $('employeeDeptFilter').value = empCurrent;
-
-    const attCurrent = $('attendanceDeptFilter').value;
-    $('attendanceDeptFilter').innerHTML = `<option value="">Barcha bo‘limlar</option>${options}`;
-    $('attendanceDeptFilter').value = attCurrent;
-
-    const chosen = $('employeeDepartment').value;
-    $('employeeDepartment').innerHTML = app.departments.map(d => `<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('');
-    if (chosen) $('employeeDepartment').value = chosen;
-  }
-
-  function renderDepartments() {
-    $('departmentGrid').innerHTML = app.departments.map(d => {
-      const count = app.employees.filter(e => e.department_id === d.id).length;
-      return `<div class="dept"><h3>${escapeHtml(d.name)}</h3><p>Faol xodimlar</p><strong>${count}</strong></div>`;
-    }).join('');
-  }
-
-  function renderReports() {
-    const today = localDateKey();
-    const records = app.employees.map(e => getAttendance(e.dbId, today));
-    $('reportTotal').textContent = app.employees.length;
-    $('reportPresent').textContent = records.filter(x => x?.checkIn).length;
-    $('reportLate').textContent = records.filter(x => statusFor(x) === 'late').length;
-    $('reportAbsent').textContent = records.filter(x => !x?.checkIn).length;
-  }
-
-  async function saveEmployee(event) {
-    event.preventDefault();
-
-    const first = $('employeeFirst').value.trim();
-    const last = $('employeeLast').value.trim();
-    const fullName = `${first} ${last}`.trim();
-    const code = `GP-${Date.now().toString().slice(-8)}`;
-    const departmentId = Number($('employeeDepartment').value);
-
-    const payload = {
-      employee_code: code,
-      full_name: fullName,
-      department_id: departmentId,
-      position: $('employeePosition').value.trim(),
-      phone: $('employeePhone').value.trim() || null,
-      hire_date: $('employeeHireDate').value || null,
-      is_active: true
-    };
-
-    const {error} = await supabaseClient.from('employees').insert(payload);
-    if (error) { dbError('Xodim saqlanmadi', error); return; }
-
-    closeModal('employeeModal');
-    await loadAllData();
-    toast(`${fullName} xodimlar ro‘yxatiga qo‘shildi va bugungi davomatda paydo bo‘ldi.`);
-  }
-
-  async function saveAttendance(event) {
-    event.preventDefault();
-
-    const employeeId = Number($('attendanceEmployee').value);
-    const date = $('attendanceDate').value;
-    const checkIn = $('attendanceCheckIn').value;
-    const checkOut = $('attendanceCheckOut').value || null;
-
-    if (!employeeId || !date || !checkIn) {
-      toast('Xodim, sana va kelish vaqtini kiriting.');
-      return;
-    }
-
-    const late = lateMinutes(checkIn);
-    const worked = checkOut ? Math.max(0, minutes(checkOut) - minutes(checkIn)) : 0;
-    const statusValue = checkOut ? 'Ishni tugatdi' : (late > 0 ? 'Kechikdi' : 'Ishda');
-
-    const payload = {
-      employee_id: employeeId,
-      attendance_date: date,
-      check_in: checkIn,
-      check_out: checkOut,
-      late_minutes: late,
-      worked_minutes: worked,
-      status: statusValue
-    };
-
-    const {error} = await supabaseClient
-      .from('attendance')
-      .upsert(payload, {onConflict:'employee_id,attendance_date'});
-
-    if (error) { dbError('Davomat saqlanmadi', error); return; }
-
-    closeModal('attendanceModal');
-    await loadAllData();
-    if ($('historyDate').value === date) await loadHistoryForDate();
-    toast('Davomat muvaffaqiyatli saqlandi.');
-  }
-
-  async function recordCheckIn(employeeId) {
-    const time = localTimeKey();
-    const late = lateMinutes(time);
-
-    const {error} = await supabaseClient
-      .from('attendance')
-      .upsert({
-        employee_id:employeeId,
-        attendance_date:localDateKey(),
-        check_in:time,
-        late_minutes:late,
-        worked_minutes:0,
-        status:late > 0 ? 'Kechikdi' : 'Ishda'
-      }, {onConflict:'employee_id,attendance_date'});
-
-    if (error) { dbError('Kelish vaqti saqlanmadi', error); return; }
-
-    await loadAllData();
-    toast(`Kelish vaqti ${time} da qayd etildi.`);
-  }
-
-  async function recordCheckOut(employeeId) {
-    const attendance = getAttendance(employeeId, localDateKey());
-
-    if (!attendance?.checkIn) {
-      toast('Avval kelish vaqtini qayd eting.');
-      return;
-    }
-
-    const time = localTimeKey();
-    const worked = Math.max(0, minutes(time) - minutes(attendance.checkIn));
-
-    const {error} = await supabaseClient
-      .from('attendance')
-      .update({check_out:time, worked_minutes:worked, status:'Ishni tugatdi'})
-      .eq('id', attendance.dbId);
-
-    if (error) { dbError('Ketish vaqti saqlanmadi', error); return; }
-
-    await loadAllData();
-    toast(`Ketish vaqti ${time} da qayd etildi.`);
-  }
-
-  async function deactivateEmployee(employeeId) {
-    const employee = app.employees.find(e => e.dbId === employeeId);
-    if (!employee) return;
-
-    if (!confirm(`${employeeName(employee)} ni xodimlar ro‘yxatidan chiqarilsinmi?`)) return;
-
-    const {error} = await supabaseClient.from('employees').update({is_active:false}).eq('id', employeeId);
-    if (error) { dbError('Xodim o‘chirilmadi', error); return; }
-
-    await loadAllData();
-    toast('Xodim ro‘yxatdan chiqarildi.');
-  }
-
-  async function saveDepartment(event) {
-    event.preventDefault();
-    const name = $('newDepartmentName').value.trim();
-    if (!name) return;
-
-    const {error} = await supabaseClient.from('departments').insert({name});
-    if (error) { dbError('Bo‘lim saqlanmadi', error); return; }
-
-    closeModal('departmentModal');
-    await loadAllData();
-    toast('Bo‘lim qo‘shildi.');
-  }
-
-  function openEmployeeModal() {
-    $('employeeForm').reset();
-    $('employeeHireDate').value = localDateKey();
-    $('employeeCode').value = `GP-${String(app.employees.length + 1).padStart(3,'0')}`;
-    fillDepartmentSelectors();
-    $('employeeModal').classList.remove('hidden');
-  }
-
-  async function openAttendanceModal(employeeId = null) {
-    if (!app.employees.length) {
-      toast('Avval xodim qo‘shing.');
-      return;
-    }
-
-    const today = localDateKey();
-    const selectedId = employeeId || app.employees[0].dbId;
-    const existing = getAttendance(selectedId, today);
-
-    $('attendanceEmployee').innerHTML = app.employees.map(e =>
-      `<option value="${e.dbId}">${escapeHtml(employeeName(e))} — ${escapeHtml(e.department)}</option>`
-    ).join('');
-
-    $('attendanceEmployee').value = String(selectedId);
-    $('attendanceDate').value = today;
-    $('attendanceCheckIn').value = existing?.checkIn || localTimeKey();
-    $('attendanceCheckOut').value = existing?.checkOut || '';
-
-    $('attendanceModal').classList.remove('hidden');
-  }
-
-  function openDepartmentModal() {
-    $('departmentForm').reset();
-    $('departmentModal').classList.remove('hidden');
-  }
-
-  function closeModal(id) {
-    $(id).classList.add('hidden');
-  }
-
-  function navigate(page) {
-    document.querySelectorAll('.page').forEach(x => x.classList.add('hidden'));
-    document.getElementById(page).classList.remove('hidden');
-
-    document.querySelectorAll('.nav button').forEach(x => {
-      x.classList.toggle('active', x.dataset.page === page);
-    });
-
-    const titles = {
-      dashboard:'Bosh sahifa', employees:'Xodimlar', attendance:'Bugungi davomat',
-      history:'Davomat tarixi', departments:'Bo‘limlar', reports:'Hisobotlar', settings:'Sozlamalar'
-    };
-    $('pageTitle').textContent = titles[page] || 'Glass Pro';
-
-    if (page === 'history') {
-      $('historyDate').value = $('historyDate').value || localDateKey();
-      loadHistoryForDate();
-    }
-  }
-
-  function saveSettings() {
-    app.startTime = $('startTime').value || '08:30';
-    app.endTime = $('endTime').value || '18:00';
-    localStorage.setItem('glasspro_start_time', app.startTime);
-    localStorage.setItem('glasspro_end_time', app.endTime);
-    renderAll();
-    toast('Ish vaqti saqlandi.');
-  }
-
-  function exportCSV() {
-    const today = localDateKey();
-    const rows = [['Xodim','ID','Bo‘lim','Kelish','Ketish','Kechikish (daq.)','Ishlangan vaqt','Holat']];
-
-    for (const e of app.employees) {
-      const a = getAttendance(e.dbId, today);
-      rows.push([
-        employeeName(e), e.code, e.department, a?.checkIn || '', a?.checkOut || '',
-        a?.checkIn ? lateMinutes(a.checkIn) : '',
-        a?.checkIn && a?.checkOut ? workedText(a.checkIn, a.checkOut) : '',
-        ({present:'Ishda',late:'Kechikdi',absent:'Kelmagan',done:'Ishni tugatdi'})[statusFor(a)]
-      ]);
-    }
-
-    const csv = rows.map(row => row.map(v => `"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');
-    const blob = new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8'});
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `glass-pro-davomat-${today}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-  }
-
-  function applyTheme(){ const dark=localStorage.getItem('glasspro_theme')==='dark'; document.body.classList.toggle('dark',dark); $('themeToggle').textContent=dark?'🌙 Tungi rejim':'☀️ Kunduzgi'; }
-  function toggleTheme(){ const dark=document.body.classList.toggle('dark'); localStorage.setItem('glasspro_theme',dark?'dark':'light'); $('themeToggle').textContent=dark?'🌙 Tungi rejim':'☀️ Kunduzgi'; }
-  function updateClock() {
-    const now = new Date();
-    $('clock').textContent = clockTime(now);
-    $('todayLabel').textContent = now.toLocaleDateString('uz-UZ',{
-      weekday:'long',year:'numeric',month:'long',day:'numeric'
-    });
-  }
-
-  document.querySelectorAll('.nav button').forEach(btn =>
-    btn.addEventListener('click', () => navigate(btn.dataset.page))
-  );
-
-  $('employeeForm').addEventListener('submit', saveEmployee);
-  $('attendanceForm').addEventListener('submit', saveAttendance);
-  $('departmentForm').addEventListener('submit', saveDepartment);
-
-  $('historyDate').value = localDateKey();
-  $('startTime').value = app.startTime;
-  $('endTime').value = app.endTime;
-
-  applyTheme();
-  updateClock();
-  setInterval(updateClock, 1000);
-  loadAllData();
-
-  /* Database'dagi o'zgarishlarni tez ko'rsatish uchun yumshoq refresh */
-  setInterval(() => {
-    if (document.visibilityState === 'visible') loadAllData();
-  }, 15000);
+const KEY='glasspro_data_v1';
+let data=JSON.parse(localStorage.getItem(KEY)||'null') || {
+  settings:{start:'08:30',end:'18:00'},
+  departments:['HR','Moliya','Buxgalteriya','Ta’minot'],
+  employees:[
+    {id:'GP-001',first:'Ali',last:'Valiyev',position:'Moliyachi',department:'Moliya',phone:'',hire:'2026-08-01'},
+    {id:'GP-002',first:'Hasan',last:'Karimov',position:'HR mutaxassis',department:'HR',phone:'',hire:'2026-08-01'},
+    {id:'GP-003',first:'Sardor',last:'Aliyev',position:'Buxgalter',department:'Buxgalteriya',phone:'',hire:'2026-08-01'},
+    {id:'GP-004',first:'Akmal',last:'Sobirov',position:'Ta’minot menejeri',department:'Ta’minot',phone:'',hire:'2026-08-01'}
+  ],
+  attendance:{}
+};
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function today(){return new Date().toISOString().slice(0,10)}
+function nowTime(){return new Date().toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function hm(){return new Date().toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'})}
+function mins(t){const [h,m]=t.split(':').map(Number);return h*60+m}
+function diffText(a,b){if(!a||!b)return '—';let d=Math.max(0,mins(b)-mins(a));return `${Math.floor(d/60)} soat ${d%60} daqiqa`}
+function attendanceFor(e){const d=data.attendance[today()]||{};return d[e.id]||{}}
+function statusOf(a){
+  if(!a.checkIn)return 'absent';
+  if(a.checkOut)return 'done';
+  if(mins(a.checkIn)>mins(data.settings.start))return 'late';
+  return 'present';
+}
+function statusBadge(s){
+  const map={present:['Ishda','green'],late:['Kechikdi','yellow'],absent:['Kelmagan','red'],done:['Ishni tugatdi','blue']};
+  const [t,c]=map[s]||['—','gray'];return `<span class="badge ${c}">${t}</span>`;
+}
+function lateText(a){if(!a.checkIn||mins(a.checkIn)<=mins(data.settings.start))return '—';return `${mins(a.checkIn)-mins(data.settings.start)} daqiqa`}
+function ensureToday(){if(!data.attendance[today()])data.attendance[today()]={};}
+function renderAll(){ensureToday();renderStats();renderDashboardAttendance();renderEmployees();renderAttendance();renderHistory();renderDepartments();fillDepartments();renderReports();document.getElementById('startTime').value=data.settings.start;document.getElementById('endTime').value=data.settings.end;save()}
+function renderStats(){
+ const es=data.employees, as=es.map(attendanceFor), present=as.filter(a=>a.checkIn), late=as.filter(a=>statusOf(a)==='late');
+ totalEmployees.textContent=es.length;presentCount.textContent=present.length;absentCount.textContent=es.length-present.length;lateCount.textContent=late.length;
+}
+function employeeRow(e){
+ const a=attendanceFor(e),s=statusOf(a);
+ return `<tr><td><div class="person"><div class="avatar">${(e.first[0]||'')}${(e.last[0]||'')}</div><div><div class="person-name">${e.first} ${e.last}</div><div class="person-sub">${e.position}</div></div></div></td><td>${e.department}</td><td>${a.checkIn||'—'}</td><td>${a.checkOut||'—'}</td><td>${statusBadge(s)}</td></tr>`
+}
+function renderDashboardAttendance(){dashboardAttendance.innerHTML=data.employees.map(employeeRow).join('')||`<tr><td colspan="5" class="empty">Hozircha xodimlar mavjud emas.</td></tr>`}
+function renderEmployees(){
+ const q=(employeeSearch?.value||'').toLowerCase(), dep=employeeDept?.value||'';
+ const es=data.employees.filter(e=>(`${e.first} ${e.last} ${e.id}`.toLowerCase().includes(q))&&(!dep||e.department===dep));
+ employeesTable.innerHTML=es.map(e=>`<tr><td><div class="person"><div class="avatar">${e.first[0]}${e.last[0]}</div><div><div class="person-name">${e.first} ${e.last}</div><div class="person-sub">${e.phone||'Telefon kiritilmagan'}</div></div></div></td><td>${e.id}</td><td>${e.department}</td><td>${e.position}</td><td>${statusBadge(statusOf(attendanceFor(e)))}</td><td><div class="actions"><button class="btn btn-primary" onclick="openAttendanceModal('${e.id}')">Davomat</button><button class="btn btn-danger" onclick="deleteEmployee('${e.id}')">O‘chirish</button></div></td></tr>`).join('')||`<tr><td colspan="6" class="empty">Xodim topilmadi.</td></tr>`;
+}
+function renderAttendance(){
+ const q=(attendanceSearch?.value||'').toLowerCase(),f=attendanceFilter?.value||'',dep=attendanceDept?.value||'';
+ const es=data.employees.filter(e=>`${e.first} ${e.last} ${e.id}`.toLowerCase().includes(q)&&(!dep||e.department===dep)&&(!f||statusOf(attendanceFor(e))===f));
+ attendanceTable.innerHTML=es.map(e=>{
+   const a=attendanceFor(e),s=statusOf(a);
+   const action=!a.checkIn?`<button class="btn btn-primary" onclick="checkIn('${e.id}')">Kelishni qayd etish</button>`:!a.checkOut?`<button class="btn btn-light" onclick="checkOut('${e.id}')">Ketishni qayd etish</button>`:`<span class="badge blue">Yakunlangan</span>`;
+   return `<tr><td><div class="person"><div class="avatar">${e.first[0]}${e.last[0]}</div><div><div class="person-name">${e.first} ${e.last}</div><div class="person-sub">${e.id}</div></div></div></td><td>${e.department}</td><td>${a.checkIn||'—'}</td><td>${a.checkOut||'—'}</td><td>${lateText(a)}</td><td>${diffText(a.checkIn,a.checkOut)}</td><td>${statusBadge(s)}</td><td>${action}</td></tr>`
+ }).join('')||`<tr><td colspan="8" class="empty">Xodim topilmadi.</td></tr>`;
+}
+function renderHistory(){
+ const date=historyDate.value||today(), day=data.attendance[date]||{};
+ historyTable.innerHTML=data.employees.map(e=>{
+   const a=day[e.id]||{},s=statusOf(a);
+   return `<tr><td>${e.first} ${e.last}</td><td>${e.department}</td><td>${a.checkIn||'—'}</td><td>${a.checkOut||'—'}</td><td>${lateText(a)}</td><td>${diffText(a.checkIn,a.checkOut)}</td><td>${statusBadge(s)}</td></tr>`
+ }).join('');
+}
+function renderDepartments(){
+ departmentGrid.innerHTML=data.departments.map(d=>{
+  const n=data.employees.filter(e=>e.department===d).length;
+  return `<div class="dept"><h3>${d}</h3><p>Faol xodimlar</p><div class="dept-count">${n}</div></div>`
+ }).join('');
+}
+function fillDepartments(){
+ [employeeDept,attendanceDept].forEach(sel=>{if(!sel)return;const v=sel.value;sel.innerHTML='<option value="">Barcha bo‘limlar</option>'+data.departments.map(d=>`<option>${d}</option>`).join('');sel.value=v});
+ department.innerHTML=data.departments.map(d=>`<option>${d}</option>`).join('');
+}
+function renderReports(){
+ const as=data.employees.map(attendanceFor);
+ reportTotal.textContent=data.employees.length;reportPresent.textContent=as.filter(a=>a.checkIn).length;reportLate.textContent=as.filter(a=>statusOf(a)==='late').length;reportAbsent.textContent=as.filter(a=>!a.checkIn).length;
+}
+function checkIn(id){
+ ensureToday();const e=data.employees.find(x=>x.id===id);const t=hm();data.attendance[today()][id]={checkIn:t,checkOut:null};
+ save();renderAll();toast(`${e.first} ${e.last} uchun kelish vaqti ${t} da qayd etildi.`);
+}
+function checkOut(id){
+ ensureToday();const a=data.attendance[today()][id];if(!a?.checkIn)return;const t=hm();a.checkOut=t;save();renderAll();toast(`Ketish vaqti ${t} da qayd etildi.`);
+}
+function deleteEmployee(id){
+ const e=data.employees.find(x=>x.id===id);if(!confirm(`${e.first} ${e.last} ni o‘chirishni tasdiqlaysizmi?`))return;
+ data.employees=data.employees.filter(x=>x.id!==id);save();renderAll();toast('Xodim o‘chirildi.');
+}
+function openEmployeeModal(){employeeForm.reset();hireDate.value=today();employeeId.value='GP-'+String(data.employees.length+1).padStart(3,'0');fillDepartments();employeeModal.classList.remove('hidden')}
+function openDeptModal(){deptForm.reset();deptModal.classList.remove('hidden')}
+function closeModal(id){document.getElementById(id).classList.add('hidden')}
+employeeForm.addEventListener('submit',e=>{
+ e.preventDefault();
+ const obj={id:employeeId.value.trim(),first:firstName.value.trim(),last:lastName.value.trim(),position:position.value.trim(),department:department.value,phone:phone.value.trim(),hire:hireDate.value};
+ if(data.employees.some(x=>x.id===obj.id)){toast('Bu Xodim ID allaqachon mavjud.');return}
+ data.employees.push(obj);ensureToday();save();closeModal('employeeModal');renderAll();toast(`${obj.first} ${obj.last} xodimlar ro‘yxati va bugungi davomatga qo‘shildi.`);
+});
+deptForm.addEventListener('submit',e=>{
+ e.preventDefault();const n=newDept.value.trim();if(!n)return;if(data.departments.includes(n)){toast('Bu bo‘lim allaqachon mavjud.');return}data.departments.push(n);save();closeModal('deptModal');renderAll();toast('Yangi bo‘lim qo‘shildi.');
+});
+function openAttendanceModal(preselectedId=''){
+  ensureToday();
+  attendanceEmployee.innerHTML=data.employees.map(e=>`<option value="${e.id}">${e.first} ${e.last} — ${e.department}</option>`).join('');
+  if(preselectedId) attendanceEmployee.value=preselectedId;
+  attendanceDate.value=today();
+  attendanceCheckIn.value=hm();
+  attendanceCheckOut.value='';
+  attendanceModal.classList.remove('hidden');
+}
+attendanceForm.addEventListener('submit',e=>{
+  e.preventDefault();
+  const id=attendanceEmployee.value, date=attendanceDate.value, ci=attendanceCheckIn.value, co=attendanceCheckOut.value;
+  if(!id||!date||!ci)return;
+  if(!data.attendance[date])data.attendance[date]={};
+  data.attendance[date][id]={checkIn:ci,checkOut:co||null};
+  save();closeModal('attendanceModal');renderAll();
+  const emp=data.employees.find(x=>x.id===id);
+  toast(`${emp.first} ${emp.last} uchun ${date} sanasiga davomat saqlandi.`);
+});
+
+function saveSettings(){data.settings.start=startTime.value;data.settings.end=endTime.value;save();renderAll();toast('Ish vaqti saqlandi.')}
+function resetToday(){if(!confirm('Bugungi demo davomat ma’lumotlarini tozalaysizmi?'))return;data.attendance[today()]={};save();renderAll();toast('Bugungi davomat tozalandi.')}
+function exportCSV(){
+ const rows=[['Xodim','ID','Bo‘lim','Kelish','Ketish','Kechikish','Ishlangan vaqt','Holat']];
+ data.employees.forEach(e=>{const a=attendanceFor(e);rows.push([`${e.first} ${e.last}`,e.id,e.department,a.checkIn||'',a.checkOut||'',lateText(a),diffText(a.checkIn,a.checkOut),({present:'Ishda',late:'Kechikdi',absent:'Kelmagan',done:'Ishni tugatdi'})[statusOf(a)]])});
+ const csv=rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n');
+ const blob=new Blob(["\ufeff"+csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`glass-pro-davomat-${today()}.csv`;a.click();URL.revokeObjectURL(url);
+}
+function showPage(page){
+ document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));document.getElementById(page).classList.remove('hidden');
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
+ const titles={dashboard:'Bosh sahifa',employees:'Xodimlar',attendance:'Bugungi davomat',history:'Davomat tarixi',departments:'Bo‘limlar',reports:'Hisobotlar',settings:'Sozlamalar'};
+ pageTitle.textContent=titles[page]||'Glass Pro';
+}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+function toast(t){toastEl.textContent=t;toastEl.classList.remove('hidden');clearTimeout(window.__toast);window.__toast=setTimeout(()=>toastEl.classList.add('hidden'),2800)}
+const toastEl=document.getElementById('toast');
+function tick(){clock.textContent=nowTime();dateText.textContent=new Date().toLocaleDateString('uz-UZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});workTimeHero.textContent=`${data.settings.start} — ${data.settings.end}`}
+historyDate.value=today();setInterval(tick,1000);tick();renderAll();
 </script>
 </body>
 </html>
