@@ -1,29 +1,62 @@
-# Glass Pro — Davomat tizimi V2
+# Glass Pro — Davomat tizimi V3
 
-Yangilangan versiya: tezkor kelish/ketish, tungi/kunduzgi rejim, kechikish, erta ketish va overtime avtomatik hisob-kitobi.
+Glass Pro uchun yangilangan, korporativ va ko‘zga qulay dashboard dizayni.
 
-## Fayllar
-- index.html
-- README.md
+## V3 yangiliklari
 
-## GitHub Pages
+- Kunduzgi va tungi rejim
+- Aniq, katta va o‘qilishi oson Dashboard
+- Bugungi davomatni statuslar bilan ajratish
+- Kelish / ketish / kechikish / erta ketish / overtime ko‘rsatkichlari
+- 60 daqiqadan oshgan vaqtlar avtomatik ravishda `1 soat 5 daqiqa` ko‘rinishida chiqariladi
+- Xodimlar ro‘yxati
+- Bugungi davomat
+- Davomat tarixi
+- Bo‘limlar
+- Hisobotlar
+- CSV eksport
+- Supabase real database bilan ishlash
+
+## Ish vaqti
+
+Standart:
+
+- Ish boshlanishi: 08:30
+- Ish tugashi: 18:00
+
+Avtomatik hisob:
+
+- Kechikish: 08:30 dan keyingi vaqt
+- Erta ketish: 18:00 dan oldingi ketish
+- Overtime: 18:00 dan keyingi ish vaqti
+- Ishlangan vaqt: kelish va ketish oralig‘i
+
+## GitHub
+
+Repository rootida:
+
+```text
+index.html
+README.md
+```
+
+GitHub Pages:
+
 `Settings → Pages → Deploy from a branch → main → / (root)`
 
 ## Supabase
-Jadvallar: `departments`, `employees`, `attendance`.
-`index.html` ichidagi `SUPABASE_URL` va `SUPABASE_ANON_KEY`ni o‘zingiznikiga almashtiring. Secret/service_role keyni frontendga qo‘ymang.
 
-## Xodim qo‘shish
-Foydalanuvchidan ID yoki ishga qabul qilingan sana so‘ralmaydi. Xodim ID tizim tomonidan avtomatik yaratiladi.
+`index.html` ichida:
 
-## Davomat
-- Kelishni tasdiqlash
-- Ketishni tasdiqlash
-- `+ Davomat qo‘shish` orqali vaqtni qo‘lda kiritish/tahrirlash
-- 08:30 dan keyingi kelish — kechikish
-- 18:00 dan oldingi ketish — erta ketish
-- 18:00 dan keyingi ketish — overtime
-- Ishlangan vaqt avtomatik hisoblanadi
+```js
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_OR_PUBLISHABLE_KEY';
+```
 
-## Keyingi bosqichlar
-Login va rollar, QR-kod, Telegram xabarnoma va audit log interfeysda rejalashtirilgan.
+qiymatlarini o‘zingizning Supabase Project URL va anon/public yoki Publishable keyingiz bilan almashtiring.
+
+`service_role` yoki secret keyni frontendga qo‘ymang.
+
+## Eslatma
+
+Login/RLS, QR-kod va Telegram xabarnomalari keyingi modul sifatida ulanishi mumkin.
